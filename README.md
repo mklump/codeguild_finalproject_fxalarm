@@ -44,3 +44,4 @@ https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs
 https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf
 
 #####Link for each module details, project setup, maintenance, and execution verification testing.
+https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf
