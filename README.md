@@ -38,7 +38,9 @@ Python, HTML5, CSS3, JavaScript
 7. C++ API calls through MQL4 script
 
 #####Link for details to each major component to follow via visual design documents.
+https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf
 
 #####Link for project schedule using .mpp MS Office Project document.
+https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf
 
 #####Link for each module details, project setup, maintenance, and execution verification testing.
