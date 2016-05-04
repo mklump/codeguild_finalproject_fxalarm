@@ -10,12 +10,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design_Docs", "Design_Docs", "{F1EB20C0-B904-4346-A615-F9352B51209E}"
 	ProjectSection(SolutionItems) = preProject
-		Design_Docs\FX Alarm Final Project Proposal same doc 1158pm.pdf = Design_Docs\FX Alarm Final Project Proposal same doc 1158pm.pdf
+		Design_Docs\FX Alarm Final project proposal.pdf = Design_Docs\FX Alarm Final project proposal.pdf
 		Design_Docs\FX Alarm Final Project.docx = Design_Docs\FX Alarm Final Project.docx
 		Design_Docs\FXAlarm_Module_Layout.pdf = Design_Docs\FXAlarm_Module_Layout.pdf
+		Design_Docs\FXAlarm_Module_Layout.pptx = Design_Docs\FXAlarm_Module_Layout.pptx
 		Design_Docs\FXAlarm_Timeline_Proposal.pdf = Design_Docs\FXAlarm_Timeline_Proposal.pdf
 		Design_Docs\FXAlarm_Timelne_Proposal.mpp = Design_Docs\FXAlarm_Timelne_Proposal.mpp
-		Design_Docs\PIPs for Heaven, LLC Recovery.pptx = Design_Docs\PIPs for Heaven, LLC Recovery.pptx
 	EndProjectSection
 EndProject
 Global
