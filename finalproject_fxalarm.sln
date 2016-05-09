@@ -20,6 +20,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design_Docs", "Design_Docs"
 		Design_Docs\primary_data_sample.html = Design_Docs\primary_data_sample.html
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Session Research", "Session Research", "{6978FCE3-3699-4F53-898F-F8EB5EE0CCCF}"
+	ProjectSection(SolutionItems) = preProject
+		finalproject_fxalarm\Session Research\fewsession.saz.exclude = finalproject_fxalarm\Session Research\fewsession.saz.exclude
+		finalproject_fxalarm\Session Research\Raw_TextHtml_Login_Request.txt.exclude = finalproject_fxalarm\Session Research\Raw_TextHtml_Login_Request.txt.exclude
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
