@@ -1,2 +1,3 @@
 venv
 django_venv
+__pycache__
