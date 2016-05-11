@@ -28,6 +28,23 @@ There is a required logic module that must correctly receive the USD data with t
 * The last and most immediate float value read for the USD 7 pairs of the the EUR/USD, GBP/USD, USD/CAD, USD/JPY,
 USD/CHF, AUD/USD, and NZD/USD
 
+## Technical Components
+* The front-end HTML will be generated using Django templates with fixed CSS layout style, JavaScript, and JQuerry.
+* The middle tier logic will be done using Python and Xml Style Sheel Transform to parse HTML either well-formed or
+malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) for the specific plan of creating this module.
+* The back-end data model will be completed through using Django's LINQ expression style query functions API to the
+database.
+
+## Schedule
+Please see the [schedule document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf) or below for the specific delivery schedule for this project.
+
+## Further Work
+* Expand the user interface to reflect a configurable UI as stated in the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) below for module details.
+* Add Expanded View for the Event Log Viewer webpage to accomodate 8 currencies and 28 currency pairs
+* Add Trade module configuration webpage
+* Add Trade Execution Engine using C++ API calls through MQL4 script for Meta Trader 4 Terminal program.
+* Add Email notificaition module for trades executed or significant theshold events.
+
 ##The following languages and software technologies will be used:
 * Python
 * HTML5
@@ -36,11 +53,8 @@ USD/CHF, AUD/USD, and NZD/USD
 * Django frontend backend kit
 * C++ API calls through MQL4 script
 
-#####Link for details to each major component to follow via visual design documents.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf
+#####[Link for details to each major component to follow via visual design documents.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf)
 
-#####Link for project schedule using .mpp MS Office Project document.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf
+#####[Link for project schedule using .mpp MS Office Project document.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf)
 
-#####Link for each module details, project setup, maintenance, and execution verification testing.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf
+#####[Link for each module details, project setup, maintenance, and execution verification testing.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf)

@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design_Docs", "Design_Docs"
 		Design_Docs\FXAlarm_Timeline_Proposal.mpp = Design_Docs\FXAlarm_Timeline_Proposal.mpp
 		Design_Docs\FXAlarm_Timeline_Proposal.pdf = Design_Docs\FXAlarm_Timeline_Proposal.pdf
 		Design_Docs\primary_data_sample.html = Design_Docs\primary_data_sample.html
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Session Research", "Session Research", "{6978FCE3-3699-4F53-898F-F8EB5EE0CCCF}"
