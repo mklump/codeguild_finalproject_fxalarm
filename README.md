@@ -6,42 +6,55 @@ to view what recently happened on the current trading session for the day for ev
 for this project is to execute trades in reaction to this financial data through the MetaTrader terminal using the
 language for that terminal.
 
-#The proposed major components of this work will be:
+## Specific Functionality
 
-1. Email generation engine - Python, HTML5, CSS3, JavaScript
+### USD Main Page
+This page will shows you are about to view live steaming data for the USD dollar group which are the EUR/USD,
+GBP/USD, USD/CAD, USD/JPY, USD/CHF, AUD/USD, and NZD/USD.
+There will be show an image of the MetaTrader Engine as a backgroup, and a single button control to proceed to
+the event viewer log webpage.
 
-2. Email template(s) to engine - Python, HTML5, CSS3, JavaScript
+### Event Viewer Log Page
+This page will show live streaming data updated each minute from our subscription website for the USD group mentioned
+on the prior page.
 
-3. Website for configuring the data harvest program, and viewing finance data driven results - 
-Python, HTML5, CSS3, JavaScript
+### Middle Tier Logic Data Parse
+There is a required logic module that must correctly receive the USD data with testing as stated on the Main page.
 
-3. Secured credentials and Configuration Data - SQL, Django
+### Data Model
+* Secure string for my credentials to auto login to the subscription website
+* String for the subscription website that is the target of receiving data from,
+* The USD group flag enabled on 7 pairs to receive data from the Middle Tier Logic Data Parser.
+* The last and most immediate float value read for the USD 7 pairs of the the EUR/USD, GBP/USD, USD/CAD, USD/JPY,
+USD/CHF, AUD/USD, and NZD/USD
 
-4. Data harvest engine - Django, DOM, XSLT, Xml data event driven processing, and lastly time permitting
+## Technical Components
+* The front-end HTML will be generated using Django templates with fixed CSS layout style, JavaScript, and JQuerry.
+* The middle tier logic will be done using Python and Xml Style Sheel Transform to parse HTML either well-formed or
+malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) for the specific plan of creating this module.
+* The back-end data model will be completed through using Django's LINQ expression style query functions API to the
+database.
 
-5. C++ API calls through MQL4 script FX trade execution to paper trade account!
+## Schedule
+Please see the [schedule document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf) or below for the specific delivery schedule for this project.
 
-#The following languages and software technologies will be used:
+## Further Work
+* Expand the user interface to reflect a configurable UI as stated in the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) below for module details.
+* Add Expanded View for the Event Log Viewer webpage to accomodate 8 currencies and 28 currency pairs
+* Add Trade module configuration webpage
+* Add Trade Execution Engine using C++ API calls through MQL4 script for Meta Trader 4 Terminal program.
+* Add Email notificaition module for trades executed or significant theshold events.
 
-1. Python,
+##The following languages and software technologies will be used:
+* Python
+* HTML5
+* CSS3
+* JavaScript calls through JQuery
+* Django frontend backend kit
+* C++ API calls through MQL4 script
 
-2. HTML5,
+#####[Link for details to each major component to follow via visual design documents.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf)
 
-3. CSS3,
+#####[Link for project schedule using .mpp MS Office Project document.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf)
 
-4. JavaScript calls through JQuery,
-
-5. Django frontend backend kit,
-
-6. SQL, and finally
-
-7. C++ API calls through MQL4 script
-
-#####Link for details to each major component to follow via visual design documents.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf
-
-#####Link for project schedule using .mpp MS Office Project document.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf
-
-#####Link for each module details, project setup, maintenance, and execution verification testing.
-https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf
+#####[Link for each module details, project setup, maintenance, and execution verification testing.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf)
