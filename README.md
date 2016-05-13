@@ -31,7 +31,7 @@ USD/CHF, AUD/USD, and NZD/USD
 ## Technical Components
 * The front-end HTML will be generated using Django templates with fixed CSS layout style, JavaScript, and JQuerry.
 * The middle tier logic will be done using Python and Xml Style Sheel Transform to parse HTML either well-formed or
-malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) for the specific plan of creating this module.
+malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf.pdf) for the specific plan of creating this module.
 * The back-end data model will be completed through using Django's LINQ expression style query functions API to the
 database.
 
@@ -39,7 +39,7 @@ database.
 Please see the [schedule document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf) or below for the specific delivery schedule for this project.
 
 ## Further Work
-* Expand the user interface to reflect a configurable UI as stated in the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20project%20proposal.pdf) below for module details.
+* Expand the user interface to reflect a configurable UI as stated in the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf) below for module details.
 * Add Expanded View for the Event Log Viewer webpage to accomodate 8 currencies and 28 currency pairs
 * Add Trade module configuration webpage
 * Add Trade Execution Engine using C++ API calls through MQL4 script for Meta Trader 4 Terminal program.
@@ -57,4 +57,4 @@ Please see the [schedule document link](https://github.com/mklump/codeguild_fina
 
 #####[Link for project schedule using .mpp MS Office Project document.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf)
 
-#####[Link for each module details, project setup, maintenance, and execution verification testing.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Final%20Project%20Proposal%20same%20doc%201158pm.pdf)
+#####[Link for each module details, project setup, maintenance, and execution verification testing.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf)
