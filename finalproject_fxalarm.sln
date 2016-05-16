@@ -23,8 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design_Docs", "Design_Docs"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Session Research", "Session Research", "{6978FCE3-3699-4F53-898F-F8EB5EE0CCCF}"
 	ProjectSection(SolutionItems) = preProject
-		finalproject_fxalarm\Session Research\fewsession.saz.exclude = finalproject_fxalarm\Session Research\fewsession.saz.exclude
-		finalproject_fxalarm\Session Research\Raw_TextHtml_Login_Request.txt.exclude = finalproject_fxalarm\Session Research\Raw_TextHtml_Login_Request.txt.exclude
+		Session Research\fewsession.saz = Session Research\fewsession.saz
+		Session Research\Raw_TextHtml_Login_Request.txt = Session Research\Raw_TextHtml_Login_Request.txt
 	EndProjectSection
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "finalproject_fxalarm", "finalproject_fxalarm\finalproject_fxalarm.pyproj", "{E76EC982-7557-4016-8E87-2312DB092F54}"
