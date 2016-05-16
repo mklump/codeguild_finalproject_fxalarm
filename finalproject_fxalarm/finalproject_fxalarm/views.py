@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finalproject_fxalarm/views.py
@@ -11,7 +12,7 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 
-from app import logic
+from . import logic
 
 def render_home(request):
     """
@@ -20,9 +21,9 @@ def render_home(request):
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/fxalarm_usd_index.html',
-        context_instance = RequestContext( {
-            'title':'US Dollar (USD) stream warning'
+        'finalproject_fxalarm/fxalarm_usd_index.html',
+        context_instance = RequestContext(request, {
+            'title':'US Dollar (USD) stream warning',
         })
     )
 
@@ -33,8 +34,8 @@ def render_eventlogviewer(request):
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/fxalarm_event_log.html',
-        context_instance = RequestContext( {
-            'title':'USD Live streaming data'
+        'finalproject_fxalarm/fxalarm_event_log.html',
+        context_instance = RequestContext(request, {
+            'title':'USD Live streaming data',
         })
     )

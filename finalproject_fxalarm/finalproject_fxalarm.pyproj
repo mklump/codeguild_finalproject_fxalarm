@@ -62,6 +62,8 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\GBPCHF_redarrow.jpg" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal1.jpg" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal2.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_event_log.html" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_usd_index.html" />

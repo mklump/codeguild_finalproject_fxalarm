@@ -7,16 +7,18 @@ by Matthew James K on 5/16/2016
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>FX Alarm Tool - Configuration</title>
+    <title>{{ title }}</title>
     {% load staticfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'app/content/fxalarm_site.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
 <body>
-    <section class="titlesection">
-        <header><h1>FX Alarm Tool - Configuration</h1></header>
+    <section class="headersection">
+        <img src="{% static 'finalproject_fxalarm/images/GBPCHF_redarrow.jpg' %}" />
+        <h1 class="h1title">{{ title }}</h1>
+        <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
     </section>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>
-    <script type="text/javascript" src="{% static 'app/scripts/fxalarm_site.js.js' %}"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
 </body>
 </html>

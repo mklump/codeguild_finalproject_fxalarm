@@ -8,6 +8,15 @@ body
     margin: 0 auto;
 }
 
-.titlesection {
-    width: 50%;
+.h1title {
+    margin: 0;
+}
+
+.headersection {
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    display: flex;
+    width: 21.3em;
+    margin: 0;
 }

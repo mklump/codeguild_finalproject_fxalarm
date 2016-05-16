@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/urls.py
@@ -11,7 +12,7 @@ from django.contrib import admin
 from django.conf.urls import url
 import django.contrib.auth.views
 
-from app import views
+from . import views
 
 # Uncomment the next lines to enable the admin:
 # from django.conf.urls import include
@@ -21,7 +22,7 @@ from app import views
 urlpatterns = [
     # Examples:
     url(r'^$', views.render_home, name = 'home'),
-    url(r'^(event|viewer|log)$', views.render_eventlogviewer, name = 'viewer')
+    url(r'^(event|viewer|log)$', views.render_eventlogviewer, name = 'viewer'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
