@@ -12,10 +12,16 @@ by Matthew James K on 5/16/2016
     <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
 <body>
-    <section class="headersection">
-        <img src="{% static 'finalproject_fxalarm/images/GBPCHF_redarrow.jpg' %}" />
-        <h1 class="h1title">{{ title }}</h1>
-        <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
+    <div class="btn_right">
+        <section class="headersection">
+            <img src="{% static 'finalproject_fxalarm/images/GBPCHF_redarrow.jpg' %}" />
+            <h1 class="h1title">{{ title }}</h1>
+            <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
+        </section>
+        <input type="submit" class="btn_width" value="PROCEED TO LIVE US DOLLAR REVIEW" />
+    </div>
+    <section>
+        <img class="usd_M1_terminal" src="{% static 'finalproject_fxalarm/images/terminal1.jpg' %}" />
     </section>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>

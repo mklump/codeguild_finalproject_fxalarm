@@ -1,4 +1,4 @@
-﻿/*
+/*
 Python Coding Bootcamp (pdxcodeguild)
 Code File for static/finalproject_fxalarm/content/fxalarm_site.css
 by: Matthew James K on 5/16/2016
@@ -6,6 +6,7 @@ by: Matthew James K on 5/16/2016
 body
 {
     margin: 0 auto;
+    /*background-image: url("../images/terminal1.jpg");*/
 }
 
 .h1title {
@@ -17,6 +18,20 @@ body
     -webkit-flex-direction: column;
     flex-direction: column;
     display: flex;
-    width: 21.3em;
+    width: 28em;
     margin: 0;
+}
+
+.usd_M1_terminal {
+    height: 100%;
+    width: 100%;
+}
+
+.btn_right {
+    display: flex;
+}
+
+.btn_width {
+    width: 100%;
+    font-size: 3.5em;
 }
