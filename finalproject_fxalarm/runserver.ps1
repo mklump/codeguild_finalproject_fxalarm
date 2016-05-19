@@ -1,2 +1,3 @@
 .\venv\Scripts\activate
-python.exe manage.py runserver 54576
+python manage.py runserver 2545
+REM PowerShell -ExecutionPolicy Unrestricted
