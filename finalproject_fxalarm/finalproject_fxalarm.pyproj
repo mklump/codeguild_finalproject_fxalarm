@@ -54,10 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\bootstrap.min_old.css" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\bootstrap_old.css" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\fxalarm_site.css" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\site_old.css" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\CHFJPY_greenarrow.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\GBPCHF_redarrow.jpg" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
@@ -67,10 +64,9 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_event_log.html" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_usd_index.html" />
-    <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\index_old.html" />
-    <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\layout_old.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
+    <Content Include="runserver.ps1" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
