@@ -6,32 +6,51 @@ by: Matthew James K on 5/16/2016
 body
 {
     margin: 0 auto;
-    /*background-image: url("../images/terminal1.jpg");*/
 }
 
 .h1title {
     margin: 0;
 }
 
-.headersection {
+.stream_warning {
     -ms-flex-direction: column;
     -webkit-flex-direction: column;
     flex-direction: column;
     display: flex;
     width: 28em;
     margin: 0;
+    font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', 'sans serif';
+    font-size: 20px;
 }
 
 .usd_M1_terminal {
-    height: 100%;
     width: 100%;
 }
 
-.btn_right {
+.top_header_bar {
     display: flex;
 }
 
-.btn_width {
+.top_btn_on_bar {
     width: 100%;
-    font-size: 3.5em;
+    font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', 'sans serif';
+    font-size: 3.6em;
+}
+
+.splash {
+    position: relative;
+}
+
+.overlay_header {
+    position: absolute;
+    top: 42%;
+    width: 100%;
+}
+
+.overlay_header span {
+    color: white;
+    font: bold 2em Helvetica, Sans-Serif;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file templates/finalproject_fxalarm/fxalarm_usd_index.html
@@ -12,16 +12,17 @@ by Matthew James K on 5/16/2016
     <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
 <body>
-    <div class="btn_right">
-        <section class="headersection">
+    <div class="top_header_bar">
+        <section class="stream_warning">
             <img src="{% static 'finalproject_fxalarm/images/GBPCHF_redarrow.jpg' %}" />
             <h1 class="h1title">{{ title }}</h1>
             <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
         </section>
-        <input type="submit" class="btn_width" value="PROCEED TO LIVE US DOLLAR REVIEW" />
+        <input type="submit" class="top_btn_on_bar" value="PROCEED TO LIVE US DOLLAR REVIEW" />
     </div>
-    <section>
+    <section class="splash">
         <img class="usd_M1_terminal" src="{% static 'finalproject_fxalarm/images/terminal1.jpg' %}" />
+        <h1 class="overlay_header"><span>YOUR DOLLAR IS WORTH MORE TODAY THAN IT WAS YESTERDAY!</span></h1>
     </section>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>
