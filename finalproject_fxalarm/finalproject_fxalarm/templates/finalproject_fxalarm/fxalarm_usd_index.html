@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file templates/finalproject_fxalarm/fxalarm_usd_index.html
@@ -7,7 +7,7 @@ by Matthew James K on 5/16/2016
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>{{ title }}</title>
+    <title>{{ title_startscreen }}</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
@@ -15,7 +15,7 @@ by Matthew James K on 5/16/2016
     <div class="top_header_bar">
         <section class="stream_warning">
             <img src="{% static 'finalproject_fxalarm/images/GBPCHF_redarrow.jpg' %}" />
-            <h1 class="h1title">{{ title }}</h1>
+            <h1 class="h1title">{{ title_startscreen }}</h1>
             <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
         </section>
         <input type="submit" class="top_btn_on_bar" value="PROCEED TO LIVE US DOLLAR REVIEW" />

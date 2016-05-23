@@ -9,24 +9,20 @@ Definition of urls for finalproject_fxalarm.
 
 from datetime import datetime
 from django.contrib import admin
-from django.conf.urls import url
+from django.conf.urls import url, include
+admin.autodiscover()
 import django.contrib.auth.views
 
 from . import views
 
-# Uncomment the next lines to enable the admin:
-# from django.conf.urls import include
-# from django.contrib import admin
-# admin.autodiscover()
-
 urlpatterns = [
     # Examples:
     url(r'^$', views.render_home, name = 'home'),
-    url(r'^(event|viewer|log)$', views.render_eventlogviewer, name = 'viewer'),
+    url(r'^event$|^viewer$|^log$', views.render_eventlogviewer, name = 'viewer'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
 ]

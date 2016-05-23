@@ -41,6 +41,13 @@ body
     position: relative;
 }
 
+div {
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    display: flex;
+}
+
 .overlay_header {
     position: absolute;
     top: 42%;
@@ -53,4 +60,13 @@ body
     background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, 0.4);
     padding: 10px;
+}
+
+.eventlogtitle {
+    color: white;
+    font: bold 2em Helvetica, Sans-Serif;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    max-width: 12.1em;
 }

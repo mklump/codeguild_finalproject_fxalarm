@@ -7,9 +7,30 @@ by: Matthew James K on 5/16/2016
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>{{ title_eventlog }}</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
 <body>
-
+    <header>
+        <h1 class="eventlogtitle">{{ title_eventlog }}</h1>
+    </header>
+    <div>
+        <blockquote>
+            <p>View Summary Capture List:</p>
+            <select id="view_select_summary" multiple="multiple">
+                <option>USD CAPTURE Monday, 5/23/2016, XX:XX:XX AM/PM PT</option>
+            </select>
+        </blockquote>
+        <blockquote>
+            <p>View Item Detail:</p>
+            <select id="view_item_detail" multiple="multiple">
+                <option>EURUSD="+0.26%" GBP/USD="-0.26%" USDJPY="-0.04%" USDCHF="+0.14%" USDCAD="-0.32%" AUDUSD="+0.21%" NZDUSD="-0.22%"</option>
+            </select>
+        </blockquote>
+    </div>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
 </body>
 </html>

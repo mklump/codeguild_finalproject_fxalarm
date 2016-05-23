@@ -23,7 +23,7 @@ def render_home(request):
         request,
         'finalproject_fxalarm/fxalarm_usd_index.html',
         context_instance = RequestContext(request, {
-            'title':'US Dollar (USD) stream warning',
+            'title_startscreen':'US Dollar (USD) Stream Warning',
         })
     )
 
@@ -36,6 +36,6 @@ def render_eventlogviewer(request):
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
         context_instance = RequestContext(request, {
-            'title':'USD Live streaming data',
+            'title_eventlog':'USD Live Streaming Data',
         })
     )

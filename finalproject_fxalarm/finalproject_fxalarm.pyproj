@@ -29,6 +29,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="finalproject_fxalarm\admin.py" />
     <Compile Include="finalproject_fxalarm\logic.py" />
     <Compile Include="finalproject_fxalarm\migrations\__init__.py" />
     <Compile Include="finalproject_fxalarm\models.py" />
