@@ -20,18 +20,22 @@ on the prior page.
 
 ### Middle Tier Logic Data Parse
 There is a required logic module that must correctly receive the USD data with testing as stated on the Main page.
+Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf) for the specific plan of creating this module.
+
+1. Simulate the actual data source as if it was reading the body of the html document right off a request object network resource connection.
+2. Perform and actually do the true html file dowload from a secure login session for true USD session acceleration data.
 
 ### Data Model
 * Secure string for my credentials to auto login to the subscription website
 * String for the subscription website that is the target of receiving data from,
-* The USD group flag enabled on 7 pairs to receive data from the Middle Tier Logic Data Parser.
-* The last and most immediate float value read for the USD 7 pairs of the the EUR/USD, GBP/USD, USD/CAD, USD/JPY,
-USD/CHF, AUD/USD, and NZD/USD
+* A float value immediately read in, and every 15 mininutes, for the USD 7 pairs of the the EUR/USD, GBP/USD, USD/CAD, USD/JPY,
+USD/CHF, AUD/USD, and the NZD/USD.
+* Lastly a time stamp for when the last data values for the US Dollar was saved.
 
 ## Technical Components
 * The front-end HTML will be generated using Django templates with fixed CSS layout style, JavaScript, and JQuerry.
 * The middle tier logic will be done using Python and Xml Style Sheel Transform to parse HTML either well-formed or
-malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf.pdf) for the specific plan of creating this module.
+malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf) for the specific plan of creating this module.
 * The back-end data model will be completed through using Django's LINQ expression style query functions API to the
 database.
 
@@ -53,7 +57,7 @@ Please see the [schedule document link](https://github.com/mklump/codeguild_fina
 * Django frontend backend kit
 * C++ API calls through MQL4 script
 
-#####[Link for details to each major component to follow via visual design documents.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Module_Layout.pdf)
+#####[Link for details to each major component to follow via visual design documents.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf)
 
 #####[Link for project schedule using .mpp MS Office Project document.](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FXAlarm_Timeline_Proposal.pdf)
 
