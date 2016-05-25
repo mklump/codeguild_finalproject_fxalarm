@@ -4,10 +4,8 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <Name>finalproject_fxalarm</Name>
     <RootNamespace>finalproject_fxalarm</RootNamespace>
-    <InterpreterId>
-    </InterpreterId>
-    <InterpreterVersion>
-    </InterpreterVersion>
+    <InterpreterId>{a1b953e1-01e9-4e1b-b8a9-af52a9786d5d}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,7 +43,6 @@
     <Compile Include="finalproject_fxalarm\settings.py" />
     <Compile Include="finalproject_fxalarm\urls.py" />
     <Compile Include="finalproject_fxalarm\wsgi.py" />
-    <Compile Include="ptvs_virtualenv_proxy.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="finalproject_fxalarm\" />
@@ -82,6 +79,19 @@
     <None Include="readme.mht">
       <SubType>WebBrowser</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="venv\">
+      <Id>{a1b953e1-01e9-4e1b-b8a9-af52a9786d5d}</Id>
+      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
+      <Version>3.5</Version>
+      <Description>venv (Python 3.5)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X86</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Django.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

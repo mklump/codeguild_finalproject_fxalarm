@@ -34,9 +34,9 @@ USD/CHF, AUD/USD, and the NZD/USD.
 
 ## Technical Components
 * The front-end HTML will be generated using Django templates with fixed CSS layout style, JavaScript, and JQuerry.
-* The middle tier logic will be done using Python and Xml Style Sheel Transform to parse HTML either well-formed or
+* The middle tier logic will be done using Python and the [Beautiful Soup XML/HTML python module](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) to parse HTML either well-formed or
 malformed bad HTML. Please see the [design document link](https://github.com/mklump/codeguild_finalproject_fxalarm/blob/master/Design_Docs/FX%20Alarm%20Project%20Scope.pdf) for the specific plan of creating this module.
-* The back-end data model will be completed through using Django's LINQ expression style query functions API to the
+* The back-end data model will be completed through using Django's Query Set/LINQ expression style query functions API to the
 database.
 
 ## Schedule
