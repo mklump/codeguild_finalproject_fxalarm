@@ -4,7 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <Name>finalproject_fxalarm</Name>
     <RootNamespace>finalproject_fxalarm</RootNamespace>
-    <InterpreterId>{a1b953e1-01e9-4e1b-b8a9-af52a9786d5d}</InterpreterId>
+    <InterpreterId>{f3eebe91-708d-4149-972b-9f4962d68b42}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">
-      <Id>{a1b953e1-01e9-4e1b-b8a9-af52a9786d5d}</Id>
+      <Id>{f3eebe91-708d-4149-972b-9f4962d68b42}</Id>
       <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
       <Version>3.5</Version>
       <Description>venv (Python 3.5)</Description>
