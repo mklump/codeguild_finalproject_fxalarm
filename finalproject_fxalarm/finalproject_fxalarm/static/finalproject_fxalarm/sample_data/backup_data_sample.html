@@ -1,0 +1,412 @@
+<!DOCTYPE html
+          PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The FOREX Heatmap</title>
+    <meta http-equiv="refresh" content="30" />
+    <style type="text/css">
+        <!--
+        body {
+            background-color: #000000;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 0px;
+            padding: 0px;
+            color: #FFFFFF;
+            font-size: 12px;
+        }
+
+        .heatmap {
+            width: 313px;
+        }
+
+        .row {
+            border-bottom: 1px solid #C0C0C0;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .credits {
+            font-size: 10px;
+            padding-top: 20px;
+            text-align: right;
+        }
+
+            .credits a {
+                font-size: 10px;
+                color: #535353;
+                text-decoration: none;
+            }
+
+        .gmt-clock {
+            text-align: right;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .symbol {
+            width: 100px;
+            padding: 0px 0px 0px 10px;
+            float: left;
+        }
+
+        .percent {
+            width: 80px;
+            padding: 0px 0px 0px 10px;
+            float: left;
+        }
+
+        .graph {
+            float: left;
+            padding-top: 2px;
+        }
+
+        .red {
+            color: #FF0000;
+        }
+
+        .green {
+            color: #00FF00;
+        }
+
+        .up {
+            color: #3F0;
+            width: 45px;
+        }
+
+        .down {
+            color: #F00;
+            width: 45px;
+        }
+
+        .up .bar {
+            background-color: #3F0;
+            display: block;
+        }
+
+        .down .bar {
+            background-color: #F00;
+            display: block;
+        }
+
+        .form-opts {
+            text-align: right;
+            padding-top: 5px;
+        }
+
+        .arrow {
+            float: left;
+            margin-left: 12px;
+            width: 11px;
+            padding: 2px 0 0 0;
+        }
+
+        .arrow__icon {
+            display: block;
+            width: 11px;
+            height: 11px;
+            background: url("img/arrows.png") left top no-repeat;
+            background-size: 11px;
+        }
+
+        .arrow__icon--down {
+            background-position: bottom;
+        }
+        -->
+    </style>
+
+</head>
+<body>
+    <div class="heatmap">
+        <div class="gmt-clock">
+            Current Date and Time: 2016-05-06 4:45:44<div>Next Reset In: 17:14:16</div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURUSD</div><div class="percent green">+0.04%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPUSD</div><div class="percent red">-0.03%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:1px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDUSD</div><div class="percent red">-0.98%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:34px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDUSD</div><div class="percent red">-0.39%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:13px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDCHF</div><div class="percent green">+0.04%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDJPY</div><div class="percent red">-0.18%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:6px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDCAD</div><div class="percent green">+0.10%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:4px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDCHF</div><div class="percent red">-0.93%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:32px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CADCHF</div><div class="percent red">-0.06%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:2px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDCHF</div><div class="percent red">-0.34%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:11px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURCHF</div><div class="percent green">+0.07%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPCHF</div><div class="percent green">+0.00%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDCHF</div><div class="percent green">+0.04%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CHFJPY</div><div class="percent red">-0.21%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:7px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURUSD</div><div class="percent green">+0.04%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURGBP</div><div class="percent green">+0.06%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURJPY</div><div class="percent red">-0.15%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:5px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURCHF</div><div class="percent green">+0.07%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURCAD</div><div class="percent green">+0.12%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:4px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURAUD</div><div class="percent green">+1.01%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:40px"> </div></div><div class="arrow"><div class="arrow__icon arrow__icon--up"></div></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURNZD</div><div class="percent green">+0.41%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:16px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDJPY</div><div class="percent red">-0.18%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:6px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURJPY</div><div class="percent red">-0.15%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:5px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPJPY</div><div class="percent red">-0.21%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:7px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDJPY</div><div class="percent red">-1.15%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:40px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"><div class="arrow__icon arrow__icon--down"></div></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CHFJPY</div><div class="percent red">-0.21%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:7px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDJPY</div><div class="percent red">-0.56%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:19px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CADJPY</div><div class="percent red">-0.26%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:9px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPUSD</div><div class="percent red">-0.03%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:1px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPNZD</div><div class="percent green">+0.34%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:13px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPCAD</div><div class="percent green">+0.07%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPAUD</div><div class="percent green">+0.95%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:37px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPCHF</div><div class="percent green">+0.00%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:1px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPJPY</div><div class="percent red">-0.21%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:7px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURGBP</div><div class="percent green">+0.06%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDUSD</div><div class="percent red">-0.98%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:34px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDCHF</div><div class="percent red">-0.93%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:32px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDCAD</div><div class="percent red">-0.87%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:30px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDJPY</div><div class="percent red">-1.15%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:40px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"><div class="arrow__icon arrow__icon--down"></div></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDNZD</div><div class="percent red">-0.59%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:20px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURAUD</div><div class="percent green">+1.01%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:40px"> </div></div><div class="arrow"><div class="arrow__icon arrow__icon--up"></div></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPAUD</div><div class="percent green">+0.95%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:37px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">USDCAD</div><div class="percent green">+0.10%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:4px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDCAD</div><div class="percent red">-0.28%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:9px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPCAD</div><div class="percent green">+0.07%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:2px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURCAD</div><div class="percent green">+0.12%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:4px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDCAD</div><div class="percent red">-0.87%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:30px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CADCHF</div><div class="percent red">-0.06%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:2px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">CADJPY</div><div class="percent red">-0.26%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:9px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">&nbsp;</div>
+            <div class="percent">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="graph">&nbsp;</div>
+            <div class="arrow">&nbsp;</div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDUSD</div><div class="percent red">-0.39%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:13px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDCHF</div><div class="percent red">-0.34%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:11px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDCAD</div><div class="percent red">-0.28%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:9px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">NZDJPY</div><div class="percent red">-0.56%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:19px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">AUDNZD</div><div class="percent red">-0.59%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:20px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:0px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">GBPNZD</div><div class="percent green">+0.34%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:13px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="row">
+            <div class="symbol">EURNZD</div><div class="percent green">+0.41%</div><div class="graph down"><div class="bar" style="float:right;height:11px;width:0px"> </div></div><div class="graph up"><div class="bar" style="height:11px;width:16px"> </div></div><div class="arrow"></div>
+            <div class="clear"> </div>
+        </div>
+        <div class="notes">
+        </div>
+        <div class="credits">
+        </div>
+    </div>
+</body>
+</html>
