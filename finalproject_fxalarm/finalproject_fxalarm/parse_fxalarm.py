@@ -3,16 +3,7 @@ Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/parse_fxalarm.py
 by Matthew James K on 5/25/2016
 """
-from html.parser import HTMLParser
+from bs4 import BeautifulSoup
 
-class MyHTMLParser(HTMLParser):
-    def handle_starttag(self, tag, attrs):
-        print("Encountered a start tag:", tag)
-    def handle_endtag(self, tag):
-        print("Encountered an end tag :", tag)
-    def handle_data(self, data):
-        print("Encountered some data  :", data)
-
-parser = MyHTMLParser()
-parser.feed('<html><head><title>Test</title></head>'
-            '<body><h1>Parse me!</h1></body></html>')
+def parse_html_source_file():
+    with open('..\static\finalproject_fxalarm\sample_data\primary_data_sample.html') as html:
