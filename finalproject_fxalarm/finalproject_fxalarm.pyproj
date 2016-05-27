@@ -74,7 +74,6 @@
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_usd_index.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22.html" />
     <Content Include="requirements.txt" />
-    <Content Include="db.sqlite3" />
     <Content Include="runserver.ps1" />
     <Content Include="web.config" />
   </ItemGroup>

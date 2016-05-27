@@ -14,4 +14,5 @@ def get_static_usd_detail_at_timestamp():
     return
 
 def save_static_usd_current_session_data():
+    # 'safely' reset and erase all prior USD data from the one table without using manage.py flush
     return
