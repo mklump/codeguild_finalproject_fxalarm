@@ -5,10 +5,5 @@ FXAlarm Final Project file finsalproject_fxalarm/logic.py
 by Matthew James K on 5/16/2016
 """
 from . import models
-
-class logic(object):
-    """
-    description of class
-    """
-
+from . import parse_fxalarm
 

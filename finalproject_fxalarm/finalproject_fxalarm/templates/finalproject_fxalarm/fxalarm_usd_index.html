@@ -18,7 +18,7 @@ by Matthew James K on 5/16/2016
             <h1 class="h1title">{{ title_startscreen }}</h1>
             <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
         </section>
-        <input type="submit" class="top_btn_on_bar" value="PROCEED TO LIVE US DOLLAR REVIEW" />
+        <a href="{% url 'viewer' %}"><input type="submit" class="top_btn_on_bar" value="PROCEED TO LIVE US DOLLAR REVIEW" /></a>
     </div>
     <section class="splash">
         <img class="usd_M1_terminal" src="{% static 'finalproject_fxalarm/images/terminal1.jpg' %}" />
