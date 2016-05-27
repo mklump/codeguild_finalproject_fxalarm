@@ -10,7 +10,6 @@ Definition of views.
 from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
-from datetime import datetime
 
 from . import logic
 
@@ -27,15 +26,32 @@ def render_home(request):
         })
     )
 
-def render_eventlogviewer(request):
+def render_static_eventlogviewer(request):
     """
-    This function renders the event viewer and log page route to fxalarm_event_log.html
+    This function renders the static data content to the event viewer and log page route to fxalarm_event_log.html
+    """
+    assert isinstance(request, HttpRequest)
+    usd_summary = logic.get_static_usd_summary_by_timestamp()
+    usd_detail = logic.get_static_usd_detail_at_timestamp()
+    return render(
+        request,
+        'finalproject_fxalarm/fxalarm_event_log.html',
+        {
+            'title_eventlog':'USD Live Streaming Data',
+            'usd_summary':usd_summary,
+            'usd_detail':usd_detail,
+        }
+    )
+
+def render_dynamic_eventlogviewer(request):
+    """
+    This function renders real-time data content to the event viewer and log page route to fxalarm_event_log.html
     """
     assert isinstance(request, HttpRequest)
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
-        context_instance = RequestContext(request, {
+        {
             'title_eventlog':'USD Live Streaming Data',
-        })
+        }
     )

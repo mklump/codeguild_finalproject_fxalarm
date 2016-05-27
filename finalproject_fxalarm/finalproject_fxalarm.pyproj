@@ -61,17 +61,19 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\fxalarm_site.css" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\CHFJPY_greenarrow.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\GBPCHF_redarrow.jpg" />
+    <None Include="web.debug - Copy.config" />
+    <None Include="web.debug.config" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal1.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal2.jpg" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_sample.html" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_sample.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-AD.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-ALL.html" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_event_log.html" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_usd_index.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22.html" />
     <Content Include="requirements.txt" />
-    <Content Include="db.sqlite3" />
     <Content Include="runserver.ps1" />
     <Content Include="web.config" />
   </ItemGroup>
