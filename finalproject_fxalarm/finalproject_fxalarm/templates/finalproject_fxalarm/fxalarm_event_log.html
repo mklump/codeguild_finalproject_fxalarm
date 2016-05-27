@@ -19,13 +19,17 @@ by: Matthew James K on 5/16/2016
         <blockquote>
             <p>View Summary Capture List:</p>
             <select id="view_select_summary" multiple="multiple">
-                <option>USD CAPTURE Monday, 5/23/2016, XX:XX:XX AM/PM PT</option>
+                <!--{% for summary in usd_summary %}
+                    <option>{{ summary }}</option>
+                {% endfor %}-->
             </select>
         </blockquote>
         <blockquote>
             <p>View Item Detail:</p>
             <select id="view_item_detail" multiple="multiple">
-                <option>EURUSD="+0.26%" GBP/USD="-0.26%" USDJPY="-0.04%" USDCHF="+0.14%" USDCAD="-0.32%" AUDUSD="+0.21%" NZDUSD="-0.22%"</option>
+                <!--{% for detail in usd_detail %}
+                    <option>{{ detail }}</option>
+                {% endfor %}-->
             </select>
         </blockquote>
     </div>

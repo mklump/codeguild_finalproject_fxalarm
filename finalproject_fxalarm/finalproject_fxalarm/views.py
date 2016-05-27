@@ -31,6 +31,7 @@ def render_static_eventlogviewer(request):
     This function renders the static data content to the event viewer and log page route to fxalarm_event_log.html
     """
     assert isinstance(request, HttpRequest)
+    logic.save_static_usd_current_session_data()
     usd_summary = logic.get_static_usd_summary_by_timestamp()
     usd_detail = logic.get_static_usd_detail_at_timestamp()
     return render(
