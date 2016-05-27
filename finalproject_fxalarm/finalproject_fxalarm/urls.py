@@ -16,7 +16,6 @@ import django.contrib.auth.views
 from . import views
 
 urlpatterns = [
-    # Examples:
     url(r'^$', views.render_home, name = 'home'),
     url(r'^event$|^viewer$|^log$', views.render_static_eventlogviewer, name = 'static_viewer'),
     #url(r'^event$|^viewer$|^log$', views.render_dynamic_eventlogviewer, name = 'dynamic_viewer'),
