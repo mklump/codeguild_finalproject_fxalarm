@@ -31,10 +31,14 @@ body
     display: flex;
 }
 
-.top_btn_on_bar {
+.a_btn {
     width: 100%;
+}
+
+.top_btn_on_bar {
+    min-width: 100%;
     font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', 'sans serif';
-    font-size: 3.6em;
+    font-size: 3.7em;
 }
 
 .splash {

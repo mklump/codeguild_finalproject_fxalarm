@@ -78,11 +78,6 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="readme.mht">
-      <SubType>WebBrowser</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Interpreter Include="venv\">
       <Id>{3883d182-867a-43a3-ac33-c1cc5fcb60bd}</Id>
       <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
