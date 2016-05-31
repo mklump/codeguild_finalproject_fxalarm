@@ -7,7 +7,7 @@ Definition of models.
 """
 
 from django.db import models
-import datetime
+from datetime import datetime
 from dateutil.tz import tzlocal
 
 # Create your models here.
@@ -40,13 +40,18 @@ class USD(models.Model):
 
     def __str__(self):
         return 'EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6} timestamp={7}'.format(
-            EURUSD, GBPUSD, USDJPY, USDCAD, USDCHF, AUDUSD, NZDUSD, timestamp
+            self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD, self.USDCHF, self.AUDUSD, self.NZDUSD, self.timestamp
             )
 
     def __repr__(self):
-        #timenow = datetime.datetime.now(tzlocal())
-        time_field = datetime.datetime(timestamp, tzlocal())
-        time_field = time_field.strftime('at %Y-%m-%d %H:%M:%S %Z')
+        time_field = None
+        try:
+            time_field = datetime.fromtimestamp(self.timestamp.timestamp(), tzlocal())
+        except Exception as error:
+            print(error)
+            raise RuntimeError(error)
+
+        time_field = time_field.strftime('%Y-%m-%d %H:%M:%S %Z')
         return 'EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6} timestamp={7}'.format(
-            EURUSD, GBPUSD, USDJPY, USDCAD, USDCHF, AUDUSD, NZDUSD, '%s' % time_field
+            self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD, self.USDCHF, self.AUDUSD, self.NZDUSD, '%s' % time_field
             )
