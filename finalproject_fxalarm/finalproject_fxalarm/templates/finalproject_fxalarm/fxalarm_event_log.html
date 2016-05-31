@@ -11,30 +11,35 @@ by: Matthew James K on 5/16/2016
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
 </head>
-<body>
+<body class="bodybackground">
     <header>
         <h1 class="eventlogtitle">{{ title_eventlog }}</h1>
     </header>
-    <div>
+    <section>
         <blockquote>
-            <p>View Summary Capture List:</p>
+            <p class="eventloglabel">USD Summary Capture List:</p>
             <select id="view_select_summary" multiple="multiple">
-                <!--{% for summary in usd_summary %}
+                {% for summary in usd_summary %}
                     <option>{{ summary }}</option>
-                {% endfor %}-->
+                {% endfor %}
             </select>
         </blockquote>
         <blockquote>
-            <p>View Item Detail:</p>
+            <p class="eventloglabel">USD Instance Detail:</p>
             <select id="view_item_detail" multiple="multiple">
-                <!--{% for detail in usd_detail %}
+                {% for detail in usd_detail %}
                     <option>{{ detail }}</option>
-                {% endfor %}-->
+                {% endfor %}
             </select>
         </blockquote>
-    </div>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>
+        <blockquote>
+            <a href="{% url 'peace_onto_you' %}"><input class="btn_peace" type="submit" value="Peace be with you, and take Good Care." /></a>
+        </blockquote>
+    </section>
+    <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>-->
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>-->
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/lodash-v4.13.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
 </body>
 </html>

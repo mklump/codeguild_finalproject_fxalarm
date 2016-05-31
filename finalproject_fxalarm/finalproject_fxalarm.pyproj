@@ -65,7 +65,9 @@
     <None Include="web.debug.config" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_one.jpg" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_four.jpg" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_ONLY.jpg" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_ONLY_large.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_three.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_two.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal1.jpg" />
@@ -73,9 +75,12 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-AD.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-ALL.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\jquery-v2.2.4.js" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\lodash-v4.13.1.js" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_event_log.html" />
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\fxalarm_usd_index.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22.html" />
+    <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\peace_be_with_you_farwell.html" />
     <Content Include="requirements.txt" />
     <Content Include="runserver.ps1" />
     <Content Include="web.config" />

@@ -16,9 +16,12 @@ import django.contrib.auth.views
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.render_home, name = 'home'),
-    url(r'^event$|^viewer$|^log$', views.render_static_eventlogviewer, name = 'static_viewer'),
-    #url(r'^event$|^viewer$|^log$', views.render_dynamic_eventlogviewer, name = 'dynamic_viewer'),
+    #url(r'^$', views.render_home, name = 'home'),
+    url(r'^$', views.render_static_eventlogviewer, name = 'home'),
+
+    url(r'^viewer$|^event_viewer$|^log$', views.render_static_eventlogviewer, name = 'static_viewer'),
+    #url(r'^viewer$|^event_viewer$|^log$', views.render_dynamic_eventlogviewer, name = 'dynamic_viewer'),
+    url(r'^peace$', views.render_peace_be_with_you, name = 'peace_onto_you'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -26,3 +29,4 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 ]
+

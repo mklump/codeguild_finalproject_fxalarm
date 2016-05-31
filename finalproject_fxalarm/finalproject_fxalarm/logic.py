@@ -4,6 +4,7 @@ Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/logic.py
 by Matthew James K on 5/16/2016
 """
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from . import models
 from . import parse_fxalarm
 
@@ -13,7 +14,7 @@ def get_static_usd_summary_by_timestamp():
     :returns: a list/array [] of strings as the summary representation of each USD instance row
     """
     currency_collection = []
-    for row in models.USD.objects().all():
+    for row in models.USD.objects.all():
         currency_collection.append('USD Capture: at %s' % row.__repr__().rsplit('at')[1])
     return currency_collection
 
@@ -23,19 +24,24 @@ def get_static_usd_detail_at_timestamp():
     :returns: a list/array [] of strings as the full details of each USD instance row
     """
     currency_collection = []
-    for row in models.USD.objects().all():
+    for row in models.USD.objects.all():
         currency_collection.append(row.__repr__().rsplit('at')[0])
     return currency_collection
 
-def save_static_usd_current_session_data():
+def save_static_usd_current_session_data(request):
     """
     This database function clears the last saved static currency data, and consecutively saves the USD session data
     from the three static sample html file sources.
+    :param1: request is the HttpRequest object being served from views.py in order to properly serve certain files
     """
     message = None
     if False == reset_currency_database():
         message = 'The currency database table(s) was not properly cleared/reset before next run.'
-    static_files = [ 'primary_data_index_QC-22.html', 'backup_data_heatmap_GROUP-AD.html', 'backup_data_heatmap_GROUP-ALL.html' ]
+    static_files = [
+        request.build_absolute_uri(static('finalproject_fxalarm/sample_data/primary_data_index_QC-22.html/')),
+        request.build_absolute_uri(static('finalproject_fxalarm/sample_data/backup_data_heatmap_GROUP-AD.html/')),
+        request.build_absolute_uri(static('finalproject_fxalarm/sample_data/backup_data_heatmap_GROUP-ALL.html/')),
+    ]
     for file in static_files:
         if False == save_from_static_instance_file(file):
             message = 'The database save function failed processing file: %s. Please recheck function.' % file
@@ -50,11 +56,13 @@ def reset_currency_database():
     :returns: True if reseting all currency database tables succeeded, otherwise it returns False
     :Note: The calling function of this method should raise an exception if this fails!
     """
-    models.USD.objects().all().remove()
-    if 0 < len(models.USD.objects().all()):
-        return False
-    else:
+
+    if 0 < models.USD.objects.count():
+        models.USD.objects.all().delete()
+    if 0 == models.USD.objects.count():
         return True
+    else:
+        return False
 
 def save_from_static_instance_file(inputfile):
     """

@@ -31,16 +31,16 @@ def render_static_eventlogviewer(request):
     This function renders the static data content to the event viewer and log page route to fxalarm_event_log.html
     """
     assert isinstance(request, HttpRequest)
-    #logic.save_static_usd_current_session_data()
-    #usd_summary = logic.get_static_usd_summary_by_timestamp()
-    #usd_detail = logic.get_static_usd_detail_at_timestamp()
+    logic.save_static_usd_current_session_data(request)
+    usd_summary = logic.get_static_usd_summary_by_timestamp()
+    usd_detail = logic.get_static_usd_detail_at_timestamp()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
         {
             'title_eventlog':'USD Live Streaming Data',
-            #'usd_summary':usd_summary,
-            #'usd_detail':usd_detail,
+            'usd_summary':usd_summary,
+            'usd_detail':usd_detail,
         }
     )
 
@@ -54,5 +54,18 @@ def render_dynamic_eventlogviewer(request):
         'finalproject_fxalarm/fxalarm_event_log.html',
         {
             'title_eventlog':'USD Live Streaming Data',
+        }
+    )
+
+def render_peace_be_with_you(request):
+    """
+    This function renders a page that offers a blessing for the one person or people reading this page.
+    """
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'finalproject_fxalarm/peace_be_with_you_farwell.html',
+        {
+            'title_peace_be_with_you':'Peace be wtih you, take Good Care.',
         }
     )

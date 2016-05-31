@@ -14,11 +14,11 @@ def parse_html_source_file(input_file):
     """
     soup_html_xml_parser = None
     try:
-        with open(input_file) as html:
+        with open(input_file, 'r') as html: # [Errno 22] Invalid argument: 'http://localhost:64131/static/finalproject_fxalarm/sample_data/primary_data_index_QC-22.html/'
             soup_html_xml_parser = BeautifulSoup(html, 'html.parser')
         # end with block/close file
     except Exception as error:
-        print(error.__cause__())
+        print(error)
         raise RuntimeError(error)
     return soup_html_xml_parser
 

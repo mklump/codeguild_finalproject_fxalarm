@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<!--
+Python Coding Bootcamp (pdxcodeguild)
+FXAlarm Final Project file templates/finalproject_fxalarm/peace_be_with_you_farwell.html
+by Matthew James K on 5/16/2016
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>{{ title_peace_be_with_you }}</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'finalproject_fxalarm/content/fxalarm_site.css' %}" />
+</head>
+<body>
+    <section class="backgroundfarewell">
+        <img class="peace_onto_you_pic" src="{% static 'finalproject_fxalarm/images/in_GOD_we_trust_ONLY_large.jpg' %}" />
+        <h1 class="cross">†††</h1>
+        <h1 class="cross message">
+            <p>For God so loved the world that he gave his only Son, so that everyone who believes in him might not perish but might have eternal life. John 3:16</p>
+            <p>His own self-perpetuating love and origin of all proves further the argument that God Exists, and all hearing the Good News (the Healing, the Gospel, 
+        and the Word of God) should not reject the argument for Salvation, but instead accept him whole-heartedly without the influence of humankind, artificial, or Sin which is 
+        the world, the flesh, and the devil.</p>
+            <p>Peace Be With You, and Take Good Care – God is Good All the Time, and All the Time God is Good.</p>
+        </h1>
+    </section>
+    <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.11.2/lodash.js"></script>-->
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.js"></script>-->
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/lodash-v4.13.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
+</body>
+</html>

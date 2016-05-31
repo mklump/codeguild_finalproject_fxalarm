@@ -18,6 +18,7 @@ function registerGlobalEventHandlers() {
 function main() {
   registerGlobalEventHandlers();
 }
+
 /*
  * This statement registers main() to be called when the associated page is 'ready'.
  */
