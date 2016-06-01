@@ -4,7 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <Name>finalproject_fxalarm</Name>
     <RootNamespace>finalproject_fxalarm</RootNamespace>
-    <InterpreterId>{3883d182-867a-43a3-ac33-c1cc5fcb60bd}</InterpreterId>
+    <InterpreterId>{bd7249f8-2217-4d53-a955-121d2e5f5f5c}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -62,9 +62,7 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\CHFJPY_greenarrow.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\GBPCHF_redarrow.jpg" />
     <None Include="web.debug - Copy.config" />
-    <None Include="web.debug.config" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
-    <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_four.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_ONLY.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_ONLY_large.jpg" />
@@ -83,11 +81,10 @@
     <Content Include="finalproject_fxalarm\templates\finalproject_fxalarm\peace_be_with_you_farwell.html" />
     <Content Include="requirements.txt" />
     <Content Include="runserver.ps1" />
-    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">
-      <Id>{3883d182-867a-43a3-ac33-c1cc5fcb60bd}</Id>
+      <Id>{bd7249f8-2217-4d53-a955-121d2e5f5f5c}</Id>
       <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
       <Version>3.5</Version>
       <Description>venv (Python 3.5)</Description>

@@ -18,6 +18,7 @@ by: Matthew James K on 5/16/2016
     <section>
         <blockquote>
             <p class="eventloglabel">USD Summary Capture List:</p>
+            <input type="hidden" id="hidden_summary" name="usd_summary" value="{{ usd_summary }}" />
             <select id="view_select_summary" multiple="multiple">
                 {% for summary in usd_summary %}
                     <option>{{ summary }}</option>
@@ -26,6 +27,7 @@ by: Matthew James K on 5/16/2016
         </blockquote>
         <blockquote>
             <p class="eventloglabel">USD Instance Detail:</p>
+			<input type="hidden" id="hidden_detail" name="usd_detail" value="{{ usd_detail }}" />
             <select id="view_item_detail" multiple="multiple">
                 {% for detail in usd_detail %}
                     <option>{{ detail }}</option>
@@ -36,10 +38,10 @@ by: Matthew James K on 5/16/2016
             <a href="{% url 'peace_onto_you' %}"><input class="btn_peace" type="submit" value="Peace be with you, and take Good Care." /></a>
         </blockquote>
     </section>
-    <!--<script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>-->
-    <!--<script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/lodash-v4.13.1.js' %}"></script>-->
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.js"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>
+    <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/lodash-v4.13.1.js' %}"></script>
+    <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.js"></script>-->
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.js"></script>-->
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
 </body>
 </html>
