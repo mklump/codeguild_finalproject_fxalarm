@@ -70,6 +70,8 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_two.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal1.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal2.jpg" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_intermediary.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_intermediary.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-AD.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-ALL.html" />

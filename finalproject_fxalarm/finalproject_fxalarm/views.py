@@ -12,6 +12,7 @@ from django.http import HttpRequest
 from django.template import RequestContext
 
 from . import logic
+from . import parse_fxalarm
 
 def render_home(request):
     """
@@ -49,6 +50,9 @@ def render_dynamic_eventlogviewer(request):
     This function renders real-time data content to the event viewer and log page route to fxalarm_event_log.html
     """
     assert isinstance(request, HttpRequest)
+    parse_fxalarm.open_fxalarm_session()
+    parse_fxalarm.get_and_keep_alive_realtime_data()
+    parse_fxalarm.close_fxalarm_session()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',

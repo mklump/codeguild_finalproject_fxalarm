@@ -5,8 +5,6 @@ FXAlarm Final Project file finsalproject_fxalarm/logic.py
 by Matthew James K on 5/16/2016
 """
 import os
-from datetime import datetime
-from dateutil.tz import tzlocal
 from . import models
 from . import parse_fxalarm
 
@@ -45,7 +43,7 @@ def save_static_usd_current_session_data():
         find_filename_by_startlookingpath('backup_data_heatmap_GROUP-ALL.html', 'finalproject_fxalarm'),
     ]
     for file in static_files:
-        save_from_static_instance_file(file)
+        parse_fxalarm.save_from_static_instance_file(file)
 
 def find_filename_by_startlookingpath(filename, startlookingpath):
     """
@@ -73,25 +71,3 @@ def reset_currency_database():
         return True
     else:
         return False
-
-def save_from_static_instance_file(inputfile):
-    """
-    This database function accepts a specified static html instance USD source file, calls the parse function,
-    and saves the incomming USD data row at that moment as the save row occured.
-    """
-    try:
-        usd = parse_fxalarm.get_next_usd_parse(inputfile)
-        usd_instance = models.USD(
-            EURUSD = float(usd[0].rstrip('%').split('=')[1]),
-            GBPUSD = float(usd[1].rstrip('%').split('=')[1]),
-            USDJPY = float(usd[2].rstrip('%').split('=')[1]),
-            USDCAD = float(usd[3].rstrip('%').split('=')[1]),
-            USDCHF = float(usd[4].rstrip('%').split('=')[1]),
-            AUDUSD = float(usd[5].rstrip('%').split('=')[1]),
-            NZDUSD = float(usd[6].rstrip('%').split('=')[1]),
-            timestamp = datetime.now(tzlocal())
-        )
-        usd_instance.save()
-    except Exception as error:
-        print(error)
-        raise RuntimeError(error)

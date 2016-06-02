@@ -4,10 +4,15 @@ FXAlarm Final Project file finsalproject_fxalarm/parse_fxalarm.py
 by Matthew James K on 5/25/2016
 """
 from bs4 import BeautifulSoup
+import re
+import urllib
+import threading
 from django.http import HttpRequest
 from django.http import HttpResponse
 
 import requests
+from datetime import datetime
+from dateutil.tz import tzlocal
 from . import models
 import os
 
@@ -25,7 +30,7 @@ def parse_html_source_file(input_file):
         # end with block/close file
     except Exception as error:
         print(error)
-        raise RuntimeError(error)
+        raise
     return soup_html_xml_parser
 
 def parse_currency_node(html_parser, currency_symbol):
@@ -70,63 +75,116 @@ def set_fxalarm_db_login(username, pwd, website):
         print(error)
         raise RuntimeError(error)
 
-def open_fxalarm_session() -> bool:
+def open_fxalarm_session():
     """
     This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
     :returns: True if the login succeeded, otherwise it will return False
     """
-    form_post_params = {
-        'vchEmail': models.MyCredentials.username_as_email.objects.all()[0],
-        'vchPassword': models.MyCredentials.password.objects.all()[0],
-    }
-    target_site = models.MyCredentials.target_website.objects.all()[0]
-    cookie_phpsessid = requests.cookies['PHPSESSID'] if 'PHPSESSID' in requests.cookies else {}
-    login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = cookie_phpsessid)
-    if '9951' == login_response.cookies['UserID']:
-        return True
-    else:
-        return False
+    try:
+        form_post_params = {
+            'vchEmail': models.MyCredentials.username_as_email.objects.all()[0],
+            'vchPassword': models.MyCredentials.password.objects.all()[0],
+        }
+        target_site = models.MyCredentials.target_website.objects.all()[0]
+        cookie_phpsessid = requests.cookies.get('PHPSESSID', {})
+        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = cookie_phpsessid)
+        if '9951' != login_response.cookies['UserID']:
+            raise RuntimeError('The login operation failed in the function open_fxalarm_session().')
+    except Exception as error:
+        print(error)
+        close_fxalarm_session()
+        raise RuntimeError(error)
 
-def get_and_keep_alive_realtime_data() -> bool:
+def get_and_keep_alive_realtime_data():
     """
-    This function checks regularly that the current active session is still active, and calls parse function of realtime data.
-    http://stackoverflow.com/questions/1622793/django-cookies-how-can-i-set-them
+    This function checks regularly that the current active session is still active,
+    and calls parse function saving the realtime data.
     """
-    target_site = models.MyCredentials.target_website.objects.all()[0]
-    cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
-    active_session = requests.get('%smember-area.php' % target_site, cookies = cookies_needed)
-    active_session = requests.get('%sheatmap.php' % target_site, cookies = cookies_needed)
-    while '9951' == requests.cookies['UserID'] and 'deleted' != requests.cookies['UserID']:
-        active_session = requests.get('%sget_v4.php' % target_site, cookies = cookies_needed)
-        active_session.text
+    try:
+        target_site = models.MyCredentials.target_website.objects.all()[0]
+        cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
+        active_session = requests.get('%smember-area.php' % target_site, cookies = cookies_needed)
+        active_session = requests.get('%sheatmap.php' % target_site, cookies = cookies_needed)
+        # main while gathering loop
+        while '9951' == requests.cookies['UserID'] and 'deleted' != requests.cookies['UserID']: # TODO: Add additional stop condition!
+            threading.current_thread().join(timeout = 15) # Wait here 15 seconds before proceeding.
+            active_session = requests.get('%sget_v4.php' % target_site, cookies = cookies_needed)
+            soup_html_parser = BeautifulSoup(active_session.text, 'html.parser')
+            primary_source = soup_html_parser.find(string = 'acForm').next_sibling.string
+            cookies_needed = dict(requests.cookies['PHPSESSID'])
+            primary_data = requests.get(primary_source, cookies = cookies_needed)
+            save_from_static_instance_file(primary_data) # primary data source .save()
+            form_post_params = { 'chk' : 2 }
+            cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
+            escaped = requests.get('%sget.php' % target_site, data = form_post_params, cookies = cookies_needed)
+            escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', escaped)
+            unescaped_string = urllib.parse.unquote_plus(escaped_string)
+            backup_source = re.match('.*\n.*iframe src="(.+)"  height=.*\n.*', unescaped_string).group(1)
+            form_post_params = { 'group' : 'all' }
+            backup_data = requests.get('%sheatmap.php' % backup_source, data = form_post_params)
+            save_from_static_instance_file(backup_data) # backup data source .save()
+    except Exception as error:
+        print(error)
+        close_fxalarm_session()
+        raise RuntimeError(error)
 
-def close_fxalarm_session() -> bool:
+def close_fxalarm_session():
     """
     This function checks if a current fxalarm session is active and closes it.
-    :returns: True if the logout succeeded, otherwise it returns False.
     """
-    target_site = models.MyCredentials.target_website.objects.all()[0]
-    logout_response = None
-    if 'UserID' in requests.cookies and 'deleted' != requests.cookies['UserID']:
-        logout_response = requests.post('%slogout.php' % target_site)
-    if 'deleted' != logout_response.cookies['UserID']:
-        logout_response.cookies['UserID'] = 'deleted'
-    if 'UserID' in logout_response.cookies and 'deleted' == logout_response.cookies['UserID']:
-        return True
-    else:
-        return False
+    try:
+        target_site = models.MyCredentials.target_website.objects.all()[0]
+        logout_response = None
+        if 'UserID' in requests.cookies and 'deleted' != requests.cookies['UserID']:
+            logout_response = requests.post('%slogout.php' % target_site)
+        if 'deleted' != logout_response.cookies['UserID']:
+            logout_response.cookies['UserID'] = 'deleted'
+        if 'UserID' not in logout_response.cookies and 'deleted' != logout_response.cookies['UserID']:
+            raise RuntimeError('The logout operation failed in the function close_fxalarm_session().')
+    except Exception as error:
+        print(error)
+        raise RuntimeError(error)
 
-#def set_cookie(response, key, value, days_expire=7):
-#  if days_expire is None:
-#    max_age = 365 * 24 * 60 * 60  #one year
-#  else:
-#    max_age = days_expire * 24 * 60 * 60 
-#  expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
-#  response.set_cookie(key, value, max_age=max_age, expires=expires,
-#                      domain=settings.SESSION_COOKIE_DOMAIN, secure=settings.SESSION_COOKIE_SECURE or None)
+def set_cookie(response: HttpResponse, key, value, minutes_expire = 89):
+    """
+    This function accepts an HttpResponse, and then through that response sets the specified cookie using
+    the specified key to the specified value with the specified expiration of 89 minutes as the default.
+    :param 1: response as the HttpResponse of which to set this specified cookie
+    :param 2: key as the cookie key as the name of this cookie
+    :param 3: value as the value of which to set for this cookie
+    :param 4: minutes_expire as the number of minutes before this specificed cookie expires
+    Example: response = HttpResponse("hello")
+             set_cookie(response, 'name', 'jujule')
+    """ # TODO: Write function to check what IP address the request object is running your code from!!!
+    if minutes_expire is None:
+        max_age = 89  #89 minutes before expiration as the default if None is passed
+    expires = datetime.datetime.strftime(
+        datetime.datetime.now(tzlocal()) + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S %Z"
+        )
+    response.set_cookie(
+        key, value, max_age = max_age, expires = expires,
+        domain = settings.SESSION_COOKIE_DOMAIN,
+        secure = settings.SESSION_COOKIE_SECURE or None
+        )
 
-## Use the following code before sending a response:
-#def view(request: HttpRequest): # TODO: Write function to check what IP address the request object is running your code from!!!
-#  response = HttpResponse("hello")
-#  set_cookie(response, 'name', 'jujule')
-#  return response
+def save_from_static_instance_file(inputfile):
+    """
+    This database function accepts a specified static html instance USD source file, calls the parse function,
+    and saves the incomming USD data row at that moment as the save row occured.
+    """
+    try:
+        usd = get_next_usd_parse(inputfile)
+        usd_instance = models.USD(
+            EURUSD = float(usd[0].rstrip('%').split('=')[1]),
+            GBPUSD = float(usd[1].rstrip('%').split('=')[1]),
+            USDJPY = float(usd[2].rstrip('%').split('=')[1]),
+            USDCAD = float(usd[3].rstrip('%').split('=')[1]),
+            USDCHF = float(usd[4].rstrip('%').split('=')[1]),
+            AUDUSD = float(usd[5].rstrip('%').split('=')[1]),
+            NZDUSD = float(usd[6].rstrip('%').split('=')[1]),
+            timestamp = datetime.now(tzlocal())
+        )
+        usd_instance.save()
+    except Exception as error:
+        print(error)
+        raise RuntimeError(error)
