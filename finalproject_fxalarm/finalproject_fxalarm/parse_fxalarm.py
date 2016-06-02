@@ -70,58 +70,63 @@ def set_fxalarm_db_login(username, pwd, website):
         print(error)
         raise RuntimeError(error)
 
-def open_fxalarm_session(request: HttpRequest) -> bool:
+def open_fxalarm_session() -> bool:
     """
     This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
+    :returns: True if the login succeeded, otherwise it will return False
     """
     form_post_params = {
         'vchEmail': models.MyCredentials.username_as_email.objects.all()[0],
         'vchPassword': models.MyCredentials.password.objects.all()[0],
     }
     target_site = models.MyCredentials.target_website.objects.all()[0]
-    r = requests.post('%slogin' % target_site, data = form_post_params)
-    fxalarm = requests.post()
-
-def get_and_keep_alive_realtime_data():
-    """
-    This function checks regularly that the current active session is still active, and calls parse function of realtime data.
-    http://stackoverflow.com/questions/1622793/django-cookies-how-can-i-set-them
-    """
-
-def close_fxalarm_session(request: HttpRequest) -> bool:
-    """
-    This function accepts an HttpRequest from the view function, and checks if a current fxalarm session is active and closes it.
-    http://docs.python-requests.org/en/master/user/quickstart/#cookies
-    http://stackoverflow.com/questions/2489669/function-parameter-types-in-python
-    :param 1: request as HttpRequest from the view function sent oridinally to open_fxalarm_session(), and kepted open by
-    get_and_keep_alive_realtime_data() for real data gathering, and is now finished from a submit button signal from the page
-    to stop gathering data, and immediately logout.
-    :returns: True if the logout succeeded, otherwise it returns False.
-    """
-    target_site = models.MyCredentials.target_website.objects.all()[0]
-    response = HttpResponse('')
-    req = None
-    if 'UserID' in request.COOKIES and 'deleted' != request.COOKIES['UserID']:
-        req = requests.post('%slogout.php' % target_site)
-        req.cookies['UserID'] = 'deleted' # OR EXECUTE
-        response.set_cookie('UserID', 'deleted')
-    if 'UserID' in request.COOKIES and 'deleted' == request.COOKIES['UserID'] or \
-       'UserID' in req.cookies and 'deleted' == req.cookies['UserID']:
+    cookie_phpsessid = requests.cookies['PHPSESSID'] if 'PHPSESSID' in requests.cookies else {}
+    login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = cookie_phpsessid)
+    if '9951' == login_response.cookies['UserID']:
         return True
     else:
         return False
 
-def set_cookie(response, key, value, days_expire=7):
-  if days_expire is None:
-    max_age = 365 * 24 * 60 * 60  #one year
-  else:
-    max_age = days_expire * 24 * 60 * 60 
-  expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
-  response.set_cookie(key, value, max_age=max_age, expires=expires,
-                      domain=settings.SESSION_COOKIE_DOMAIN, secure=settings.SESSION_COOKIE_SECURE or None)
+def get_and_keep_alive_realtime_data() -> bool:
+    """
+    This function checks regularly that the current active session is still active, and calls parse function of realtime data.
+    http://stackoverflow.com/questions/1622793/django-cookies-how-can-i-set-them
+    """
+    target_site = models.MyCredentials.target_website.objects.all()[0]
+    cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
+    active_session = requests.get('%smember-area.php' % target_site, cookies = cookies_needed)
+    active_session = requests.get('%sheatmap.php' % target_site, cookies = cookies_needed)
+    while '9951' == requests.cookies['UserID'] and 'deleted' != requests.cookies['UserID']:
+        active_session = requests.get('%sget_v4.php' % target_site, cookies = cookies_needed)
+        active_session.text
 
-# Use the following code before sending a response:
-def view(request: HttpRequest): # TODO: Write function to check what IP address the request object is running your code from!!!
-  response = HttpResponse("hello")
-  set_cookie(response, 'name', 'jujule')
-  return response
+def close_fxalarm_session() -> bool:
+    """
+    This function checks if a current fxalarm session is active and closes it.
+    :returns: True if the logout succeeded, otherwise it returns False.
+    """
+    target_site = models.MyCredentials.target_website.objects.all()[0]
+    logout_response = None
+    if 'UserID' in requests.cookies and 'deleted' != requests.cookies['UserID']:
+        logout_response = requests.post('%slogout.php' % target_site)
+    if 'deleted' != logout_response.cookies['UserID']:
+        logout_response.cookies['UserID'] = 'deleted'
+    if 'UserID' in logout_response.cookies and 'deleted' == logout_response.cookies['UserID']:
+        return True
+    else:
+        return False
+
+#def set_cookie(response, key, value, days_expire=7):
+#  if days_expire is None:
+#    max_age = 365 * 24 * 60 * 60  #one year
+#  else:
+#    max_age = days_expire * 24 * 60 * 60 
+#  expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
+#  response.set_cookie(key, value, max_age=max_age, expires=expires,
+#                      domain=settings.SESSION_COOKIE_DOMAIN, secure=settings.SESSION_COOKIE_SECURE or None)
+
+## Use the following code before sending a response:
+#def view(request: HttpRequest): # TODO: Write function to check what IP address the request object is running your code from!!!
+#  response = HttpResponse("hello")
+#  set_cookie(response, 'name', 'jujule')
+#  return response
