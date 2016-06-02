@@ -4,9 +4,10 @@ FXAlarm Final Project file finsalproject_fxalarm/parse_fxalarm.py
 by Matthew James K on 5/25/2016
 """
 from bs4 import BeautifulSoup
-import requests
 from django.http import HttpRequest
 from django.http import HttpResponse
+
+import requests
 from . import models
 import os
 
@@ -62,16 +63,24 @@ def set_fxalarm_db_login(username, pwd, website):
     try:
         my_credentials = models.MyCredentials(username_as_email = username,
             password = pwd,
-            target_website = website,)
+            target_website = website,
+            )
         my_credentials.save()
     except Exception as error:
         print(error)
         raise RuntimeError(error)
 
-def open_fxalarm_session():
+def open_fxalarm_session(request: HttpRequest) -> bool:
     """
     This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
     """
+    form_post_params = {
+        'vchEmail': models.MyCredentials.username_as_email.objects.all()[0],
+        'vchPassword': models.MyCredentials.password.objects.all()[0],
+    }
+    target_site = models.MyCredentials.target_website.objects.all()[0]
+    r = requests.post('%slogin' % target_site, data = form_post_params)
+    fxalarm = requests.post()
 
 def get_and_keep_alive_realtime_data():
     """
@@ -81,16 +90,26 @@ def get_and_keep_alive_realtime_data():
 
 def close_fxalarm_session(request: HttpRequest) -> bool:
     """
-    This function checks if a current fxalarm session is active, and closes it.
+    This function accepts an HttpRequest from the view function, and checks if a current fxalarm session is active and closes it.
     http://docs.python-requests.org/en/master/user/quickstart/#cookies
     http://stackoverflow.com/questions/2489669/function-parameter-types-in-python
+    :param 1: request as HttpRequest from the view function sent oridinally to open_fxalarm_session(), and kepted open by
+    get_and_keep_alive_realtime_data() for real data gathering, and is now finished from a submit button signal from the page
+    to stop gathering data, and immediately logout.
+    :returns: True if the logout succeeded, otherwise it returns False.
     """
     target_site = models.MyCredentials.target_website.objects.all()[0]
+    response = HttpResponse('')
+    req = None
     if 'UserID' in request.COOKIES and 'deleted' != request.COOKIES['UserID']:
         req = requests.post('%slogout.php' % target_site)
         req.cookies['UserID'] = 'deleted' # OR EXECUTE
-        response = HttpResponse('')
         response.set_cookie('UserID', 'deleted')
+    if 'UserID' in request.COOKIES and 'deleted' == request.COOKIES['UserID'] or \
+       'UserID' in req.cookies and 'deleted' == req.cookies['UserID']:
+        return True
+    else:
+        return False
 
 def set_cookie(response, key, value, days_expire=7):
   if days_expire is None:
