@@ -66,14 +66,15 @@ def set_fxalarm_db_login(username, pwd, website):
     :param 3: website as string to save to target_website
     """
     try:
-        my_credentials = models.MyCredentials(username_as_email = username,
+        my_credentials = models.MyCredentials(
+            username_as_email = username,
             password = pwd,
             target_website = website,
             )
         my_credentials.save()
     except Exception as error:
         print(error)
-        raise RuntimeError(error)
+        raise
 
 def open_fxalarm_session():
     """
@@ -82,18 +83,19 @@ def open_fxalarm_session():
     """
     try:
         form_post_params = {
-            'vchEmail': models.MyCredentials.username_as_email.objects.all()[0],
-            'vchPassword': models.MyCredentials.password.objects.all()[0],
+            'vchEmail': models.MyCredentials.objects.all().values('username_as_email')[0]['username_as_email'],
+            'vchPassword': models.MyCredentials.objects.all().values('password')[0]['password'],
         }
-        target_site = models.MyCredentials.target_website.objects.all()[0]
-        cookie_phpsessid = requests.cookies.get('PHPSESSID', {})
+        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
+        cookie_phpsessid = requests.cookies.RequestsCookieJar.get('PHPSESSID', {}) #module 'requests.cookies' has no attribute 'get' # NOW error: 'str' object has no attribute '_find_no_duplicates'
         login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = cookie_phpsessid)
         if '9951' != login_response.cookies['UserID']:
             raise RuntimeError('The login operation failed in the function open_fxalarm_session().')
+        close_fxalarm_session()
     except Exception as error:
         print(error)
         close_fxalarm_session()
-        raise RuntimeError(error)
+        raise
 
 def get_and_keep_alive_realtime_data():
     """
@@ -101,7 +103,7 @@ def get_and_keep_alive_realtime_data():
     and calls parse function saving the realtime data.
     """
     try:
-        target_site = models.MyCredentials.target_website.objects.all()[0]
+        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
         cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
         active_session = requests.get('%smember-area.php' % target_site, cookies = cookies_needed)
         active_session = requests.get('%sheatmap.php' % target_site, cookies = cookies_needed)
@@ -126,14 +128,14 @@ def get_and_keep_alive_realtime_data():
     except Exception as error:
         print(error)
         close_fxalarm_session()
-        raise RuntimeError(error)
+        raise
 
 def close_fxalarm_session():
     """
     This function checks if a current fxalarm session is active and closes it.
     """
     try:
-        target_site = models.MyCredentials.target_website.objects.all()[0]
+        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
         logout_response = None
         if 'UserID' in requests.cookies and 'deleted' != requests.cookies['UserID']:
             logout_response = requests.post('%slogout.php' % target_site)
@@ -143,7 +145,7 @@ def close_fxalarm_session():
             raise RuntimeError('The logout operation failed in the function close_fxalarm_session().')
     except Exception as error:
         print(error)
-        raise RuntimeError(error)
+        raise
 
 def set_cookie(response: HttpResponse, key, value, minutes_expire = 89):
     """
@@ -187,4 +189,4 @@ def save_from_static_instance_file(inputfile):
         usd_instance.save()
     except Exception as error:
         print(error)
-        raise RuntimeError(error)
+        raise
