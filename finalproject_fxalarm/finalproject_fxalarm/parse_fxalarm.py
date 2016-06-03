@@ -11,10 +11,15 @@ from django.http import HttpRequest
 from django.http import HttpResponse
 
 import requests
+from requests.cookies import RequestsCookieJar
+import browser_cookie3
 from datetime import datetime
+from datetime import timedelta
 from dateutil.tz import tzlocal
 from . import models
 import os
+
+gcookies = RequestsCookieJar()
 
 def parse_html_source_file(input_file):
     """
@@ -76,7 +81,7 @@ def set_fxalarm_db_login(username, pwd, website):
         print(error)
         raise
 
-def open_fxalarm_session():
+def open_fxalarm_session(): # refactor to accept 2 arguments username_as_email, password
     """
     This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
     :returns: True if the login succeeded, otherwise it will return False
@@ -86,9 +91,13 @@ def open_fxalarm_session():
             'vchEmail': models.MyCredentials.objects.all().values('username_as_email')[0]['username_as_email'],
             'vchPassword': models.MyCredentials.objects.all().values('password')[0]['password'],
         }
-        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
-        cookie_phpsessid = requests.cookies.RequestsCookieJar.get('PHPSESSID', {}) #module 'requests.cookies' has no attribute 'get' # NOW error: 'str' object has no attribute '_find_no_duplicates'
-        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = cookie_phpsessid)
+        target_site = get_target_website()
+        gcookies = get_target_website_cookies()
+        if 'PHPSESSID' not in gcookies._cookies:
+            gcookies.set({ 'PHPSESSID':'2e40549eeb46e0603b341232a5c02fa0' })
+        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = gcookies)
+        for cookie in login_response.cookies:
+            gcookies.set_cookie(cookie)
         if '9951' != login_response.cookies['UserID']:
             raise RuntimeError('The login operation failed in the function open_fxalarm_session().')
         close_fxalarm_session()
@@ -97,7 +106,7 @@ def open_fxalarm_session():
         close_fxalarm_session()
         raise
 
-def get_and_keep_alive_realtime_data():
+def get_and_keep_alive_realtime_data(): # refactor: split each to 3 parts request setup, execute request, verify the request
     """
     This function checks regularly that the current active session is still active,
     and calls parse function saving the realtime data.
@@ -130,44 +139,23 @@ def get_and_keep_alive_realtime_data():
         close_fxalarm_session()
         raise
 
-def close_fxalarm_session():
+def close_fxalarm_session(): # refactor: split each to 3 parts request setup, execute request, verify the request
     """
     This function checks if a current fxalarm session is active and closes it.
     """
     try:
         target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
-        logout_response = None
-        if 'UserID' in requests.cookies and 'deleted' != requests.cookies['UserID']:
+        if 'UserID' in gcookies.items and 'deleted' != gcookies.get('UserID', {}):
             logout_response = requests.post('%slogout.php' % target_site)
-        if 'deleted' != logout_response.cookies['UserID']:
-            logout_response.cookies['UserID'] = 'deleted'
-        if 'UserID' not in logout_response.cookies and 'deleted' != logout_response.cookies['UserID']:
+            for cookie in logout_response.cookies:
+                gcookies.set_cookie(cookie)
+        if 'deleted' != gcookies.get('UserID', {}):
+            gcookies.set_cookie( { 'UserID':'deleted' } )
+        if 'UserID' not in gcookies.items and 'deleted' != gcookies.get('UserID', {}):
             raise RuntimeError('The logout operation failed in the function close_fxalarm_session().')
     except Exception as error:
         print(error)
         raise
-
-def set_cookie(response: HttpResponse, key, value, minutes_expire = 89):
-    """
-    This function accepts an HttpResponse, and then through that response sets the specified cookie using
-    the specified key to the specified value with the specified expiration of 89 minutes as the default.
-    :param 1: response as the HttpResponse of which to set this specified cookie
-    :param 2: key as the cookie key as the name of this cookie
-    :param 3: value as the value of which to set for this cookie
-    :param 4: minutes_expire as the number of minutes before this specificed cookie expires
-    Example: response = HttpResponse("hello")
-             set_cookie(response, 'name', 'jujule')
-    """ # TODO: Write function to check what IP address the request object is running your code from!!!
-    if minutes_expire is None:
-        max_age = 89  #89 minutes before expiration as the default if None is passed
-    expires = datetime.datetime.strftime(
-        datetime.datetime.now(tzlocal()) + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S %Z"
-        )
-    response.set_cookie(
-        key, value, max_age = max_age, expires = expires,
-        domain = settings.SESSION_COOKIE_DOMAIN,
-        secure = settings.SESSION_COOKIE_SECURE or None
-        )
 
 def save_from_static_instance_file(inputfile):
     """
@@ -190,3 +178,44 @@ def save_from_static_instance_file(inputfile):
     except Exception as error:
         print(error)
         raise
+
+def get_target_website_cookies():
+    """
+    This function loads all supported browser cookies, and provides back the cookiejar structure
+    of all the known and saved cookies for this application's target website
+    :returns: cookiejar collection of all known cookies required for target website
+    """
+    gcookies = browser_cookie3.load()
+    target_website = get_target_website()
+    target_website = target_website.lstrip('http://www')
+    return gcookies._cookies[target_website]
+
+def get_target_website():
+    """
+    This function returns the target website this web application is using by querying the database for it.
+    """
+    return models.MyCredentials.objects.all().values('target_website')[0]['target_website']
+
+def set_cookie(key, value, minutes_expire = 89):
+    """
+    This function sets the specified cookie using the specified key to the specified value with the
+    specified expiration of 89 minutes as the default.
+    :param 1: key as the cookie key as the name of this cookie
+    :param 2: value as the value of which to set for this cookie
+    :param 3: minutes_expire as the number of minutes before this specificed cookie expires
+    """ # TODO: Write function to check what IP address the request object is running your code from!!!
+    gcookies = browser_cookie3.load()
+    if minutes_expire is None:
+        max_age = 89  #89 minutes before expiration as the default if None is passed
+    expires = datetime.datetime.strftime( 
+        datetime.now(tzlocal()) + timedelta(seconds = max_age), "%a, %d-%b-%Y %H:%M:%S %Z"
+        )
+    created_cookie = browser_cookie3.create_cookie(
+        get_target_website().lstrip('http://www'), #website for this cookie
+        '/', #path for this cookie
+        True, #is this cookie 'secure'?
+        str(expires), #expiration for this cookie
+        key, #key name for this cookie
+        value #value for this cookie
+        )
+    browser_cookie3.chrome().set_cookie(created_cookie)
