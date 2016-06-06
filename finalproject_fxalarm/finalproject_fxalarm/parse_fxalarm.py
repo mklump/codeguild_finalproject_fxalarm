@@ -17,9 +17,16 @@ from datetime import datetime
 from datetime import timedelta
 from dateutil.tz import tzlocal
 from . import models
+import uuid
 import os
 
 gcookies = RequestsCookieJar()
+
+def get_gcookies():
+    """
+    Get function for the global variable gcookies
+    """
+    return gcookies
 
 def parse_html_source_file(input_file):
     """
@@ -48,7 +55,6 @@ def parse_currency_node(html_parser, currency_symbol):
     """
     match = html_parser.find(string = currency_symbol)
     return '{0}={1}'.format(match, match.next_element.next_element.string)
-
 
 def get_next_usd_parse(input_file):
     """
@@ -81,41 +87,115 @@ def set_fxalarm_db_login(username, pwd, website):
         print(error)
         raise
 
-def open_fxalarm_session(): # refactor to accept 2 arguments username_as_email, password
+def check_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, stream = None):
     """
-    This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
-    :returns: True if the login succeeded, otherwise it will return False
+    This function accepts a request_url, request_params, and cookies_needed for the next http request, checks if
+    the url is 'executable', and then passes it to execute_next_http_request() with all the parameters if the
+    complete path can be reached.
+    :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
+        Requests.Get() while streaming Requests.Reponse.text
+    :param 2: request_url as the complete url to be checked
+    :param 3: request_params (optional) to be passed to execute_next_http_request() if check passes
+    :param 4: cookies_needed (optional) to be passed to execute_next_http_request() if check passes
+    :param 5: stream as (optional) whether to immediately download the response content. 
+    :returns: the returned requests.response object if all went well
     """
     try:
+        response_last_url = requests.get(request_url)
+        if 200 == response_last_url.status_code:
+            response_last_url = execute_next_http_request(request_url, cookies_needed, request_params, stream)
+        else:
+            raise RuntimeError('The request_url {0} returned status: {1}'.format(request_url, response_last_url.status_code))
+        return response_last_url
+    except Exception as error:
+        print(error)
+        raise
+
+def execute_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, stream = None):
+    """
+    This fuction accepts a request_url, request_params, and cookies_needed for the next http request, and executes
+    the full url with the get request parameters, and cookies collection to ensure the response was timly, and that the
+    response has the correct response code. If it does, then the requests.reponse object is handed back to the next request.
+    :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
+        Requests.Get() while streaming Requests.Reponse.text
+    :param 2: request_url as the complete url to be executed
+    :param 3: request_params (optional) to be used with this request execution
+    :param 4: cookies_needed (optional) to be used with this request execution
+    :param 5: stream as (optional) whether to immediately download the response content. 
+    :returns: the returned requests.response object if all went well
+    """
+    try:
+        response_last_url = requests.get(request_url, cookies = cookies_needed, data = request_params, stream = stream)
+        if 5 < response_last_url.elapsed.total_seconds() or 200 != response_last_url.status_code:
+            raise RuntimeError('The http request url: {0}, with streaming: {1}, with cookies: {2}, and get request data: {3}' +
+                               ' has failed with status code: {4}, and taking {5} seconds amount of time to see a response.'.format(
+                               request_url, stream, cookies_needed, request_params,
+                               response_last_url.status_code, response_last_url.elapsed.total_seconds())
+                               )
+        return response_last_url
+    except Exception as error:
+        print(error)
+        raise
+
+def open_fxalarm_session(username_as_email, password):
+    """
+    This function reads the MyCredentials table for the existance of 1 row, and starts a new active session.
+    :param 1: username_as_email as the secure credentials email as username from the database with the request
+    :param 2: password as the secure credentials password from the database with the request
+    :returns: a list of login_response, and the gcookies global cookies instances that were created which determines the active session
+    """
+    login_response = None
+    try:
         form_post_params = {
-            'vchEmail': models.MyCredentials.objects.all().values('username_as_email')[0]['username_as_email'],
-            'vchPassword': models.MyCredentials.objects.all().values('password')[0]['password'],
+            'vchEmail': username_as_email,
+            'vchPassword': password,
         }
         target_site = get_target_website()
-        gcookies = get_target_website_cookies()
-        if 'PHPSESSID' not in gcookies._cookies:
-            gcookies.set({ 'PHPSESSID':'2e40549eeb46e0603b341232a5c02fa0' })
-        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = gcookies)
+        get_target_website_cookies()
+        if 'PHPSESSID' not in get_gcookies().iterkeys():
+            uid = uuid.uuid4()
+            set_cookie('PHPSESSID', uid.hex)
+        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = get_gcookies())
         for cookie in login_response.cookies:
-            gcookies.set_cookie(cookie)
-        if '9951' != login_response.cookies['UserID']:
-            raise RuntimeError('The login operation failed in the function open_fxalarm_session().')
-        close_fxalarm_session()
+            get_gcookies().set_cookie(cookie)
+        if '9951' != login_response.cookies.get('UserID', {}):
+            raise RuntimeError('The login operation failed in the function open_fxalarm_session(), or ' +
+                               'a login attempt at the target website is not currently allowed (90min lockout).')
+        #close_fxalarm_session()
+        return_list = [ login_response, get_gcookies() ]
+        return return_list
+    except Exception as error:
+        print(error)
+        close_fxalarm_session(login_response, get_gcookies())
+        raise
+
+def step_through_membersarea_to_source(response_last_url, cookies_needed):
+    """
+    This function immediately follows after open_fxalarm_session(), but before execute_main_data_gathering_loop() to
+    step the requests mock browser object through the required click web links to the main streaming html page.
+    :param 1: response_last_url is the Request.Response object instance that was passed from the last call to open_fxalarm_session()
+    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the last call to open_fxalarm_session()
+    """
+    try:
+        target_site = get_target_website()
+        response_last_url = check_next_http_request(response_last_url,'%smember-area.php' % target_site, cookies_needed)
+        response_last_url = check_next_http_request(response_last_url,'%sheatmap.php' % target_site, cookies_needed)
+        return_list = [ response_last_url, get_gcookies() ]
+        return return_list
     except Exception as error:
         print(error)
         close_fxalarm_session()
         raise
 
-def get_and_keep_alive_realtime_data(): # refactor: split each to 3 parts request setup, execute request, verify the request
+def execute_main_data_gathering_loop(response_last_url, cookies_needed):
     """
     This function checks regularly that the current active session is still active,
     and calls parse function saving the realtime data.
+    :param 1: response_last_url is the Request.Response object instance that was passed from the last call to step_through_membersarea_to_source()
+    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the last call to step_through_membersarea_to_source()
     """
     try:
-        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
-        cookies_needed = dict(requests.cookies['PHPSESSID'], requests.cookies['UserID'])
-        active_session = requests.get('%smember-area.php' % target_site, cookies = cookies_needed)
-        active_session = requests.get('%sheatmap.php' % target_site, cookies = cookies_needed)
+        target_site = get_target_website()
         # main while gathering loop
         while '9951' == requests.cookies['UserID'] and 'deleted' != requests.cookies['UserID']: # TODO: Add additional stop condition!
             threading.current_thread().join(timeout = 15) # Wait here 15 seconds before proceeding.
@@ -134,24 +214,29 @@ def get_and_keep_alive_realtime_data(): # refactor: split each to 3 parts reques
             form_post_params = { 'group' : 'all' }
             backup_data = requests.get('%sheatmap.php' % backup_source, data = form_post_params)
             save_from_static_instance_file(backup_data) # backup data source .save()
+        return_list = [ response_last_url, get_gcookies() ]
+        return return_list
     except Exception as error:
         print(error)
         close_fxalarm_session()
         raise
 
-def close_fxalarm_session(): # refactor: split each to 3 parts request setup, execute request, verify the request
+def close_fxalarm_session(response_last_url, cookies_needed):
     """
     This function checks if a current fxalarm session is active and closes it.
+    :param 1: response_last_url is the Request.Response object instance that was passed from the last call to open_fxalarm_session()
+    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the last call to open_fxalarm_session()
     """
     try:
-        target_site = models.MyCredentials.objects.all().values('target_website')[0]['target_website']
-        if 'UserID' in gcookies.items and 'deleted' != gcookies.get('UserID', {}):
-            logout_response = requests.post('%slogout.php' % target_site)
-            for cookie in logout_response.cookies:
-                gcookies.set_cookie(cookie)
-        if 'deleted' != gcookies.get('UserID', {}):
-            gcookies.set_cookie( { 'UserID':'deleted' } )
-        if 'UserID' not in gcookies.items and 'deleted' != gcookies.get('UserID', {}):
+        target_site = get_target_website()
+        get_gcookies().update(get_target_website_cookies().copy())
+        response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site, cookies_needed)
+        #response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site)
+        for cookie in response_last_url.cookies:
+            get_gcookies().set_cookie(cookie)
+        if 'deleted' != get_gcookies().get('UserID', {}):
+            set_cookie('UserID', 'deleted')
+        if 'UserID' not in get_gcookies().items() and 'deleted' != get_gcookies().get('UserID', {}):
             raise RuntimeError('The logout operation failed in the function close_fxalarm_session().')
     except Exception as error:
         print(error)
@@ -185,10 +270,16 @@ def get_target_website_cookies():
     of all the known and saved cookies for this application's target website
     :returns: cookiejar collection of all known cookies required for target website
     """
-    gcookies = browser_cookie3.load()
+    get_gcookies().update(browser_cookie3.load())
     target_website = get_target_website()
-    target_website = target_website.lstrip('http://www')
-    return gcookies._cookies[target_website]
+    target_website = target_website.lstrip('http://').rstrip('/')
+    if target_website not in get_gcookies()._cookies:
+        return RequestsCookieJar()
+    else:
+        get_gcookies().clear()
+        for cookie in browser_cookie3.load(target_website):
+            get_gcookies().set_cookie(cookie)
+        return get_gcookies()
 
 def get_target_website():
     """
@@ -196,26 +287,30 @@ def get_target_website():
     """
     return models.MyCredentials.objects.all().values('target_website')[0]['target_website']
 
-def set_cookie(key, value, minutes_expire = 89):
+def set_cookie(key, value, minutes_expire = None):
     """
     This function sets the specified cookie using the specified key to the specified value with the
     specified expiration of 89 minutes as the default.
     :param 1: key as the cookie key as the name of this cookie
     :param 2: value as the value of which to set for this cookie
     :param 3: minutes_expire as the number of minutes before this specificed cookie expires
+    :returns: the created_cookie that was set
     """ # TODO: Write function to check what IP address the request object is running your code from!!!
-    gcookies = browser_cookie3.load()
     if minutes_expire is None:
-        max_age = 89  #89 minutes before expiration as the default if None is passed
-    expires = datetime.datetime.strftime( 
+        max_age = 89 * 60 #89 minutes before expiration as the default if None is passed
+    expires = datetime.strptime(datetime.strftime( 
         datetime.now(tzlocal()) + timedelta(seconds = max_age), "%a, %d-%b-%Y %H:%M:%S %Z"
-        )
+        ), "%a, %d-%b-%Y %H:%M:%S %Z")
     created_cookie = browser_cookie3.create_cookie(
-        get_target_website().lstrip('http://www'), #website for this cookie
+        get_target_website().lstrip('http://').rstrip('/'), #website for this cookie
         '/', #path for this cookie
         True, #is this cookie 'secure'?
-        str(expires), #expiration for this cookie
+        expires.toordinal(), #expiration for this cookie
         key, #key name for this cookie
         value #value for this cookie
         )
     browser_cookie3.chrome().set_cookie(created_cookie)
+    while key in get_target_website_cookies().items():
+        get_gcookies().clear(get_target_website().lstrip('http://').rstrip('/'), '/', key)
+    get_gcookies().set_cookie(created_cookie)
+    return created_cookie
