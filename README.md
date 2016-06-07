@@ -6,6 +6,21 @@ to view what recently happened on the current trading session for the day for ev
 for this project is to execute trades in reaction to this financial data through the MetaTrader terminal using the
 language for that terminal.
 
+##Setup
+1. Install all the listed required python modules from requirements.txt
+Please email Matthew James [matthew@klump-pdx.com](mailto:matthew@klump-pdx.com) for instructions on how to setup database using the django
+administration tool.
+2. To bypass setting up the database table row, and view static flat-file-data-only: Open the file urls.py, and edit
+line 22 to uncomment the view function render_static_eventlogviewer(), and then edit line 23 to comment out the view
+function render_static_eventlogviewer().
+
+##Usage
+After setup, execute django server within your virtual environment, navigate to the fist page, click the top bar
+button to proceed to the live streamine viewer page, observer ideal live streaming data, lastly ALWAYS click the
+button labeled "Stop Main Data Gathering Execution" to release the data gathering resources before refereshing
+this page. Updates are in the works to automatically release the gathering resources if the event viewer page
+becomes refreshed.
+
 ## Specific Functionality
 
 ### USD Main Page

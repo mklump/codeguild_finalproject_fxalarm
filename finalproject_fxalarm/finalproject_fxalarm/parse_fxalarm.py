@@ -95,8 +95,8 @@ def check_next_http_request(response_last_url, request_url, cookies_needed = Non
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
         Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be checked
-    :param 3: request_params (optional) to be passed to execute_next_http_request() if check passes
-    :param 4: cookies_needed (optional) to be passed to execute_next_http_request() if check passes
+    :param 3: cookies_needed (optional) to be passed to execute_next_http_request() if check passes
+    :param 4: request_params (optional) to be passed to execute_next_http_request() if check passes
     :param 5: stream as (optional) whether to immediately download the response content. 
     :returns: the returned requests.response object if all went well
     """
@@ -119,13 +119,14 @@ def execute_next_http_request(response_last_url, request_url, cookies_needed = N
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
         Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be executed
-    :param 3: request_params (optional) to be used with this request execution
-    :param 4: cookies_needed (optional) to be used with this request execution
+    :param 3: cookies_needed (optional) to be used with this request execution
+    :param 4: request_params (optional) to be used with this request execution
     :param 5: stream as (optional) whether to immediately download the response content. 
     :returns: the returned requests.response object if all went well
     """
     try:
         response_last_url = requests.get(request_url, cookies = cookies_needed, data = request_params, stream = stream)
+        get_target_website_cookies(response_last_url.cookies)
         if 5 < response_last_url.elapsed.total_seconds() or 200 != response_last_url.status_code:
             raise RuntimeError('The http request url: {0}, with streaming: {1}, with cookies: {2}, and get request data: {3}' +
                                ' has failed with status code: {4}, and taking {5} seconds amount of time to see a response.'.format(
@@ -149,6 +150,8 @@ def open_fxalarm_session(username_as_email, password):
         form_post_params = {
             'vchEmail': username_as_email,
             'vchPassword': password,
+            'x':37,
+            'y':10,
         }
         target_site = get_target_website()
         get_target_website_cookies()
@@ -156,8 +159,7 @@ def open_fxalarm_session(username_as_email, password):
             uid = uuid.uuid4()
             set_cookie('PHPSESSID', uid.hex)
         login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = get_gcookies())
-        for cookie in login_response.cookies:
-            get_gcookies().set_cookie(cookie)
+        get_target_website_cookies(login_respons.cookies)
         if '9951' != login_response.cookies.get('UserID', {}):
             raise RuntimeError('The login operation failed in the function open_fxalarm_session(), or ' +
                                'a login attempt at the target website is not currently allowed (90min lockout).')
@@ -178,6 +180,7 @@ def step_through_membersarea_to_source(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
+        get_target_website_cookies(cookies_needed)
         response_last_url = check_next_http_request(response_last_url,'%smember-area.php' % target_site, cookies_needed)
         response_last_url = check_next_http_request(response_last_url,'%sheatmap.php' % target_site, cookies_needed)
         return_list = [ response_last_url, get_gcookies() ]
@@ -223,17 +226,17 @@ def execute_main_data_gathering_loop(response_last_url, cookies_needed):
 
 def close_fxalarm_session(response_last_url, cookies_needed):
     """
-    This function checks if a current fxalarm session is active and closes it.
+    This function checks if a current fxalarm session is active and closes it by executing 3 http requests.get() calls to properly logout.
     :param 1: response_last_url is the Request.Response object instance that was passed from the last call to open_fxalarm_session()
     :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the last call to open_fxalarm_session()
     """
     try:
         target_site = get_target_website()
-        get_gcookies().update(get_target_website_cookies().copy())
+        get_gcookies().update(get_target_website_cookies(cookies_needed).copy())
         response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site, cookies_needed)
         #response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site)
-        for cookie in response_last_url.cookies:
-            get_gcookies().set_cookie(cookie)
+        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed, { 'err' : 2 })
+        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed)
         if 'deleted' != get_gcookies().get('UserID', {}):
             set_cookie('UserID', 'deleted')
         if 'UserID' not in get_gcookies().items() and 'deleted' != get_gcookies().get('UserID', {}):
@@ -264,21 +267,28 @@ def save_from_static_instance_file(inputfile):
         print(error)
         raise
 
-def get_target_website_cookies():
+def get_target_website_cookies(more_cookies_to_load = None):
     """
     This function loads all supported browser cookies, and provides back the cookiejar structure
     of all the known and saved cookies for this application's target website
+    :param 1: more_cookies_to_load represents a collection of the cookies set from the last response to the previous get request
     :returns: cookiejar collection of all known cookies required for target website
     """
     get_gcookies().update(browser_cookie3.load())
-    target_website = get_target_website()
-    target_website = target_website.lstrip('http://').rstrip('/')
-    if target_website not in get_gcookies()._cookies:
+    target = get_target_website()
+    target_website1 = target.lstrip('http://').rstrip('/')
+    target_website2 = target.lstrip('http://www').rstrip('/')
+    if target not in get_gcookies()._cookies:
         return RequestsCookieJar()
     else:
         get_gcookies().clear()
-        for cookie in browser_cookie3.load(target_website):
+        for cookie in browser_cookie3.load(target_website1):
             get_gcookies().set_cookie(cookie)
+        for cookie in browser_cookie3.load(target_website2):
+            get_gcookies().set_cookie(cookie)
+        if None != more_cookies_to_load:
+            for cookie in more_cookies_to_load:
+                get_gcookies().set_cookie(cookie)
         return get_gcookies()
 
 def get_target_website():

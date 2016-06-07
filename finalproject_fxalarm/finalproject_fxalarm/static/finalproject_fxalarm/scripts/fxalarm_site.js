@@ -6,42 +6,44 @@ by: Matthew James K on 5/16/2016
 'use strict'
 
 /*
- * This function returns the usd_summary list of strings for processing.
- * @returns {Array} Of strings that is the usd_summary of each data capture snapshot.
+ * This function provides the initial selected and hidden detail items within the select item controls.
+ * The summary select list will show the first item selected, and the details list will show the first
+ * details item visible, and the remaining item details items will be hidden.
  */
-function getUSDSummaryCollection() {
-  var summary = $('[name=\'usd_summary\']');
-  return summary[0].value;
+function initializeSelectControls() {
+  $('select.view_select_summary > option')[0].selected = true;
+  $('select.view_item_detail > option')[0].hidden = false;
+  $('select.view_item_detail > option')[0].selected = true;
+  var item_detail_collection = $('select.view_item_detail > option');
+  for (var detail = 1; detail < item_detail_collection.length; detail++) {
+    item_detail_collection[detail].hidden = true;
+  }
 }
 
 /*
- * This function returns the usd_summary list of strings for processing.
- * @returns {Array} Of strings that is the usd_detail of each data capture snapshot.
+ * This function accepts the option selection summary that was clicked on, and then shows the associated
+ * option selection details of that summary that was clicked on.
+ * @param {<option></option>} [clickedSummary] that received the left click event
  */
-function getUSDDetailCollection() {
-  var detail = $('[name=\'usd_detail\']');
-  return detail[0].value;
+function showDetailsBySummarySelection(clickedSummary) {
+  var details = $('select.view_item_detail > option');
+  for (var item in details) {
+    if (clickedSummary.index === item.index) {
+      item.hidden = false;
+      item.selected = true;
+    } else {
+      item.hidden = true;
+      item.selected = false;
+    }
+  }
 }
 
 /*
  * This function registers the click event of the summary select item option list to reveal the details.
  */
 function registerSelectOptionClick() {
-  $('#view_select_summary > option').on('click', function(event) {
-    var capture_summaries = getUSDSummaryCollection(); // Outputs "['This', 'inner', 'list']", and requires Array.from(arrayLike[, mapFn[, thisArg]])
-    var count = 0;
-    for (var line in capture_summaries) {
-      if (line === event.target.value)
-        break;
-      else
-        count++;
-    }
-    var summary;
-    for (summary = 0; summary < capture_summaries.length; summary++) {
-      if (capture_summaries[summary] === event.target.value)
-        break;
-    }
-    $('#view_item_detail').innerHTML = '';
+  $('select.view_select_summary > option').on('click', function (event) {
+    showDetailsBySummarySelection(event.target);
   });
 }
 
@@ -58,6 +60,7 @@ function registerGlobalEventHandlers() {
  */
 function main() {
   registerGlobalEventHandlers();
+  initializeSelectControls();
 }
 
 /*

@@ -18,7 +18,7 @@ by Matthew James K on 5/16/2016
             <h1 class="h1title">{{ title_startscreen }}</h1>
             <img src="{% static 'finalproject_fxalarm/images/CHFJPY_greenarrow.jpg' %}" />
         </section>
-        <a href="{% url 'dynamic_viewer' %}" class="width_parentmax">
+        <a href="{% url 'event_viewer' %}" class="width_parentmax">
             <input type="submit" class="top_btn_on_bar" value="PROCEED TO LIVE US DOLLAR REVIEW" />
         </a>
     </div>
@@ -28,8 +28,8 @@ by Matthew James K on 5/16/2016
     </section>
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/lodash-v4.13.1.js' %}"></script>
-    <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.js"></script>-->
-    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.js"></script>-->
+    {#<script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.js"></script>#}
+    {#<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.js"></script>#}
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/fxalarm_site.js' %}"></script>
 </body>
 </html>
