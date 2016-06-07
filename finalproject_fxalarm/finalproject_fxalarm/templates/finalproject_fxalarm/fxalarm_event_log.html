@@ -16,28 +16,37 @@ by: Matthew James K on 5/16/2016
         <h1 class="eventlogtitle">{{ title_eventlog }}</h1>
     </header>
     <section>
-        <blockquote>
+        <blockquote class="column_viewer">
             <p class="eventloglabel">USD Summary Capture List:</p>
-            <select class="view_select_summary" multiple="multiple">
+			<input class="eventloglabelinstruct eventloglabel" type="text" disabled="disabled"
+				value="Ctrl+Select multiple summaries or click VIEW ALL:"/>
+			<input class="eventlogviewall eventloglabel" type="submit" value="VIEW ALL" />
+            <select class="view_select_summary max_width_eventlog" multiple="multiple">
                 {% for summary in usd_summary %}
                     <option>{{ summary }}</option>
                 {% endfor %}
             </select>
         </blockquote>
-        <blockquote>
+        <blockquote class="column_viewer">
             <p class="eventloglabel">USD Instance Detail:</p>
-            <select class="view_item_detail" multiple="multiple">
+            <select class="view_item_detail max_width_eventlog" multiple="multiple">
                 {% for detail in usd_detail %}
                     <option>{{ detail }}</option>
                 {% endfor %}
             </select>
         </blockquote>
 		<blockquote>
-			<input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" />
-            {#<a href="{% url '' %}"><input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" /></a>#}
+			<a>
+				<input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" />
+			</a>
+            {#<a href="{% url '' %}">#}
+            	{#<input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" />#}
+            {#</a>#}
         </blockquote>
         <blockquote>
-            <a href="{% url 'peace_onto_you' %}"><input class="btn_eventviewer" type="submit" value="Peace be with you, and take Good Care." /></a>
+            <a href="{% url 'peace_onto_you' %}">
+            	<input class="btn_eventviewer" type="submit" value="Peace be with you, and take Good Care." />
+            </a>
         </blockquote>
     </section>
     <script type="text/javascript" src="{% static 'finalproject_fxalarm/scripts/jquery-v2.2.4.js' %}"></script>

@@ -49,7 +49,7 @@ body {
 
 .btn_eventviewer {
     color: white;
-    min-width: 40%;
+    min-width: 34em;
     background: rgba(0, 0, 0, 0.4);
     font: bold 1.5em Helvetica, Sans-Serif;
 }
@@ -67,6 +67,10 @@ body {
 
 .width_parentmax {
     width: 100%;
+}
+
+.max_width_eventlog {
+    max-width: 61.3em;
 }
 
 .top_header_bar {
@@ -96,6 +100,18 @@ body {
     color: white;
     background: rgba(0, 0, 0, 0.4);
     padding: 10px;
+}
+
+.eventloglabelinstruct {
+    font: bold 1em Helvetica, Sans-Serif;
+    min-width: 24em;
+}
+
+.eventlogviewall {
+    font: bold 0.8em Helvetica, Sans-Serif;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px;
+    min-width: 63.9em;
 }
 
 .eventlogtitle {

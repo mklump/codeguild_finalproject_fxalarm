@@ -6,44 +6,68 @@ by: Matthew James K on 5/16/2016
 'use strict'
 
 /*
- * This function provides the initial selected and hidden detail items within the select item controls.
- * The summary select list will show the first item selected, and the details list will show the first
- * details item visible, and the remaining item details items will be hidden.
+ * This function provides the initial selected and hidden detail items within the
+ * select item controls.
+ * The summary select list will show the first item selected, and the details list
+ * will show the first details item visible, and the remaining item details items
+ * will be hidden.
  */
 function initializeSelectControls() {
   $('select.view_select_summary > option')[0].selected = true;
   $('select.view_item_detail > option')[0].hidden = false;
   $('select.view_item_detail > option')[0].selected = true;
-  var item_detail_collection = $('select.view_item_detail > option');
-  for (var detail = 1; detail < item_detail_collection.length; detail++) {
-    item_detail_collection[detail].hidden = true;
+  var itemDetails = $('select.view_item_detail > option');
+  for (var detail = 1; detail < itemDetails.length; detail++) {
+    itemDetails[detail].hidden = true;
   }
 }
 
 /*
- * This function accepts the option selection summary that was clicked on, and then shows the associated
- * option selection details of that summary that was clicked on.
+ * This function accepts the option selection summary that was clicked on, and then shows
+ * the associated option selection details of that summary that was clicked on.
  * @param {<option></option>} [clickedSummary] that received the left click event
  */
 function showDetailsBySummarySelection(clickedSummary) {
   var details = $('select.view_item_detail > option');
-  for (var item in details) {
-    if (clickedSummary.index === item.index) {
-      item.hidden = false;
-      item.selected = true;
+  for (var item = 0; item < details.length; item++) {
+    details[item].selected = false;
+  }
+  for (var item = 0; item < details.length; item++) {
+    if (clickedSummary.selected === true) {
+      details[clickedSummary.index].hidden = false;
+      details[clickedSummary.index].selected = true;
     } else {
-      item.hidden = true;
-      item.selected = false;
+      details[clickedSummary.index].hidden = true;
+      details[clickedSummary.index].selected = false;
     }
   }
 }
 
 /*
- * This function registers the click event of the summary select item option list to reveal the details.
+ * This function registers the click event handler of the summary select item option list
+ * to reveal the details.
  */
 function registerSelectOptionClick() {
-  $('select.view_select_summary > option').on('click', function (event) {
+  $('select.view_select_summary > option').on('click', function(event) {
     showDetailsBySummarySelection(event.target);
+  });
+}
+
+/*
+ * This function registers the click event handler of the VIEW ALL button that selects all
+ * of the USD summaries in the summary select list, and also displays all of the USD detail instances
+ * in the USD details select item list all at once.
+ */
+function registerViewAllBtnClick() {
+  // Selector jquery select the VIEW ALL button by its assigned control type and style classes:
+  $('input.eventlogviewall.eventloglabel').on('click', function() {
+    var summaries = $('select.view_select_summary > option');
+    var details = $('select.view_item_detail > option');
+    for (var x = 0; x < summaries.length; x++) {
+      summaries[x].selected = true;
+      details[x].hidden = false;
+      details[x].selected = true;
+    }
   });
 }
 
@@ -53,6 +77,7 @@ function registerSelectOptionClick() {
  */
 function registerGlobalEventHandlers() {
   registerSelectOptionClick();
+  registerViewAllBtnClick();
 }
 
 /*
