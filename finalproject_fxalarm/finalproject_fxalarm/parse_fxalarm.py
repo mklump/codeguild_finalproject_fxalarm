@@ -87,7 +87,7 @@ def set_fxalarm_db_login(username, pwd, website):
         print(error)
         raise
 
-def check_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, stream = None):
+def check_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, headers = None, stream = None):
     """
     This function accepts a request_url, request_params, and cookies_needed for the next http request, checks if
     the url is 'executable', and then passes it to execute_next_http_request() with all the parameters if the
@@ -95,15 +95,16 @@ def check_next_http_request(response_last_url, request_url, cookies_needed = Non
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
         Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be checked
-    :param 3: cookies_needed (optional) to be passed to execute_next_http_request() if check passes
-    :param 4: request_params (optional) to be passed to execute_next_http_request() if check passes
-    :param 5: stream as (optional) whether to immediately download the response content. 
+    :param 3: cookies_needed CookieJar (optional) dictionary to be used with this request execution
+    :param 4: request_params (optional) to be used with this request execution
+    :param 5: headers (optional) dictionary that must be included with this request execution such as tracked Referers
+    :param 6: stream as (optional) whether to immediately download the response content 
     :returns: the returned requests.response object if all went well
     """
     try:
         response_last_url = requests.get(request_url)
         if 200 == response_last_url.status_code:
-            response_last_url = execute_next_http_request(request_url, cookies_needed, request_params, stream)
+            response_last_url = execute_next_http_request(request_url, cookies_needed, request_params, headers, stream)
         else:
             raise RuntimeError('The request_url {0} returned status: {1}'.format(request_url, response_last_url.status_code))
         return response_last_url
@@ -111,7 +112,7 @@ def check_next_http_request(response_last_url, request_url, cookies_needed = Non
         print(error)
         raise
 
-def execute_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, stream = None):
+def execute_next_http_request(response_last_url, request_url, cookies_needed = None, request_params = None, headers = None, stream = None):
     """
     This fuction accepts a request_url, request_params, and cookies_needed for the next http request, and executes
     the full url with the get request parameters, and cookies collection to ensure the response was timly, and that the
@@ -119,18 +120,19 @@ def execute_next_http_request(response_last_url, request_url, cookies_needed = N
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the next
         Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be executed
-    :param 3: cookies_needed (optional) to be used with this request execution
+    :param 3: cookies_needed CookieJar (optional) dictionary to be used with this request execution
     :param 4: request_params (optional) to be used with this request execution
-    :param 5: stream as (optional) whether to immediately download the response content. 
+    :param 5: headers (optional) dictionary that must be included with this request execution such as tracked Referers
+    :param 6: stream as (optional) whether to immediately download the response content
     :returns: the returned requests.response object if all went well
     """
     try:
-        response_last_url = requests.get(request_url, cookies = cookies_needed, data = request_params, stream = stream)
+        response_last_url = requests.get(request_url, cookies = cookies_needed, data = request_params, headers = headers, stream = stream)
         get_target_website_cookies(response_last_url.cookies)
         if 5 < response_last_url.elapsed.total_seconds() or 200 != response_last_url.status_code:
-            raise RuntimeError('The http request url: {0}, with streaming: {1}, with cookies: {2}, and get request data: {3}' +
-                               ' has failed with status code: {4}, and taking {5} seconds amount of time to see a response.'.format(
-                               request_url, stream, cookies_needed, request_params,
+            raise RuntimeError('The http request url: {0}, with streaming: {1}, with cookies: {2}, with get request data: {3}, and with headers: {4}' +
+                               ' has failed with status code: {5}, and taking {6} seconds amount of time to see a response.'.format(
+                               request_url, stream, cookies_needed, request_params, headers,
                                response_last_url.status_code, response_last_url.elapsed.total_seconds())
                                )
         return response_last_url
@@ -154,11 +156,12 @@ def open_fxalarm_session(username_as_email, password):
             'y':10,
         }
         target_site = get_target_website()
+        header = { 'Referer':'%slogin' % target_site }
         get_target_website_cookies()
         if 'PHPSESSID' not in get_gcookies().iterkeys():
             uid = uuid.uuid4()
             set_cookie('PHPSESSID', uid.hex)
-        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = get_gcookies())
+        login_response = requests.post('%slogin' % target_site, data = form_post_params, cookies = get_gcookies(), headers = header)
         get_target_website_cookies(login_respons.cookies)
         if '9951' != login_response.cookies.get('UserID', {}):
             raise RuntimeError('The login operation failed in the function open_fxalarm_session(), or ' +
@@ -181,8 +184,10 @@ def step_through_membersarea_to_source(response_last_url, cookies_needed):
     try:
         target_site = get_target_website()
         get_target_website_cookies(cookies_needed)
-        response_last_url = check_next_http_request(response_last_url,'%smember-area.php' % target_site, cookies_needed)
-        response_last_url = check_next_http_request(response_last_url,'%sheatmap.php' % target_site, cookies_needed)
+        header = { 'Referer':'%slogin' % target_site }
+        response_last_url = check_next_http_request(response_last_url,'%smember-area.php' % target_site, cookies_needed, None, header)
+        header = { 'Referer':'%smember-area.php' % target_site }
+        response_last_url = check_next_http_request(response_last_url,'%sheatmap.php' % target_site, cookies_needed,  None, header)
         return_list = [ response_last_url, get_gcookies() ]
         return return_list
     except Exception as error:
@@ -232,11 +237,12 @@ def close_fxalarm_session(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
+        header = { 'Referer':'%sheatmap.php' % target_site }
         get_gcookies().update(get_target_website_cookies(cookies_needed).copy())
-        response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site, cookies_needed)
-        #response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site)
-        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed, { 'err' : 2 })
-        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed)
+        response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site, cookies_needed, None, header)
+        #response_last_url = check_next_http_request(response_last_url,'%slogout.php' % target_site) #original request
+        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed, { 'err' : 2 }, header)
+        response_last_url = check_next_http_request(response_last_url,'%slogin.php' % target_site, cookies_needed, None, header)
         if 'deleted' != get_gcookies().get('UserID', {}):
             set_cookie('UserID', 'deleted')
         if 'UserID' not in get_gcookies().items() and 'deleted' != get_gcookies().get('UserID', {}):
