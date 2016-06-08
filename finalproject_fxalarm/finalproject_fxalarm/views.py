@@ -45,7 +45,7 @@ def render_home(request):
     return render(
         request,
         'finalproject_fxalarm/fxalarm_usd_index.html',
-        context_instance = RequestContext(request, {
+        context_instance=RequestContext(request, {
             'title_startscreen':'US Dollar (USD) Stream Warning',
         })
     )
@@ -56,9 +56,9 @@ def render_static_eventlogviewer(request):
     fxalarm_event_log.html
     """
     assert isinstance(request, HttpRequest)
-    logic.save_static_usd_current_session_data()
+    logic.save_static_usd_data()
     usd_summary = logic.get_static_usd_summary()
-    usd_detail = logic.get_static_usd_detail_at_timestamp()
+    usd_detail = logic.get_static_usd_detail()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
@@ -109,7 +109,7 @@ def render_dynamic_eventlogviewer(request):
     set_stop_execution(False)
 
     usd_summary = logic.get_static_usd_summary()
-    usd_detail = logic.get_static_usd_detail_at_timestamp()
+    usd_detail = logic.get_static_usd_detail()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
@@ -127,7 +127,7 @@ def render_stop_gathering(request, stop_gathering):
     named stop_execution that this while loop will be checking as a stop condition.
     """
     assert isinstance(request, HttpRequest)
-    if 'True' == stop_gathering:
+    if stop_gathering == 'True':
         stop_execution = True
     render_dynamic_eventlogviewer(request)
     return HttpResponse('')

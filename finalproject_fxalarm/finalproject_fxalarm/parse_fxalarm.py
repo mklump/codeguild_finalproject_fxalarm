@@ -129,6 +129,15 @@ def check_next_http_request(response_last_url,
         print(error)
         raise
 
+def verify_cookie_url_validity(request_url, cookies_needed):
+    """
+    This function checks the domain attribute of all cookies being sent with each request,
+    and matches that domain string to the URL of the request that is being sent.
+    :param 1: request_url as a string of the current request's uniform resource locator (identifier)
+    :param 2: cookies_needed as CookieJar collection of cookie objects going into each request
+    """
+    #for cookie in cookies_needed:
+
 def execute_next_http_request(response_last_url,
                               request_url,
                               cookies_needed=None,
@@ -190,15 +199,14 @@ def open_fxalarm_session(username_as_email, password):
         }
         target_site = get_target_website()
         header = {'Referer':'%slogin' % target_site}
-        get_target_website_cookies()
-        if 'PHPSESSID' not in get_gcookies().iterkeys():
-            uid = uuid.uuid4()
-            set_cookie('PHPSESSID', uid.hex)
+        #if 'PHPSESSID' not in get_gcookies().iterkeys():
+        #    uid = uuid.uuid4()
+        #    set_cookie('PHPSESSID', uid.hex)
         login_response = requests.post('%slogin' % target_site, #First POST request to opensession
                                        data=form_post_params,
                                        cookies=get_gcookies(),
                                        headers=header)
-        get_target_website_cookies(login_response.cookies)
+        get_target_website_cookies(login_response)
         if login_response.cookies.get('UserID', {}) != '9951':
             raise RuntimeError(
                 'The login operation failed in the function ' +
@@ -225,13 +233,13 @@ def request_memberarea_navigation(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
-        get_target_website_cookies(cookies_needed)
         header = {'Referer':'%slogin' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%smember-area.php' % target_site,
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
@@ -252,17 +260,17 @@ def request_heatmap_navigation(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
-        get_target_website_cookies(cookies_needed)
         header = {'Referer':'%smember-area.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%sheatmap.php' % target_site,
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def request_mainsource_link(response_last_url, cookies_needed):
@@ -280,17 +288,17 @@ def request_mainsource_link(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
-        get_target_website_cookies(cookies_needed)
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%sget_v4.php' % target_site,
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def request_mainsource_data(response_last_url, cookies_needed):
@@ -311,7 +319,6 @@ def request_mainsource_data(response_last_url, cookies_needed):
     try:
         threading.current_thread().join(timeout=15) # Wait here 15 seconds before proceeding.
         target_site = get_target_website()
-        get_target_website_cookies(cookies_needed)
         header = {'Referer':'%sget_v4.php' % target_site}
         response_last_url.encoding = 'utf-8'
         soup_html_parser = BeautifulSoup(response_last_url.text, 'html.parser')
@@ -321,13 +328,14 @@ def request_mainsource_data(response_last_url, cookies_needed):
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         response_last_url.encoding = 'utf-8'
         save_from_static_instance_file(response_last_url.text) # Data! -> primary data .save()
-        close_fxalarm_session() # TODO: remove this line of code when primary data retrival passes!
+        close_fxalarm_session(response_last_url, cookies_needed) # TODO: Remove after testing
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def request_backupsource_link(response_last_url, cookies_needed):
@@ -346,7 +354,6 @@ def request_backupsource_link(response_last_url, cookies_needed):
     """
     try:
         target_site = get_target_website()
-        get_target_website_cookies(cookies_needed)
         form_post_params = {'chk' : 2}
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
@@ -354,10 +361,11 @@ def request_backupsource_link(response_last_url, cookies_needed):
                                                     cookies_needed,
                                                     form_post_params,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def request_backupsource_data(response_last_url, cookies_needed):
@@ -375,7 +383,6 @@ def request_backupsource_data(response_last_url, cookies_needed):
         created which determines the active session
     """
     try:
-        get_target_website_cookies(cookies_needed)
         response_last_url.encoding = 'utf-8'
         escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', response_last_url.text)
         unescaped_string = urllib.parse.unquote_plus(escaped_string)
@@ -389,13 +396,14 @@ def request_backupsource_data(response_last_url, cookies_needed):
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         response_last_url.encoding = 'utf-8'
         #Backup data!  -> backup data source .save()
         save_from_static_instance_file(response_last_url.text)
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def close_fxalarm_session(response_last_url, cookies_needed):
@@ -411,12 +419,13 @@ def close_fxalarm_session(response_last_url, cookies_needed):
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
-        get_gcookies().update(get_target_website_cookies(cookies_needed).copy())
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogout.php' % target_site,
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
+        #get_gcookies().update(get_target_website_cookies(cookies_needed).copy())
         #response_last_url = check_next_http_request(
             #response_last_url,'%slogout.php' % target_site) #original request
         response_last_url = check_next_http_request(response_last_url,
@@ -424,11 +433,13 @@ def close_fxalarm_session(response_last_url, cookies_needed):
                                                     cookies_needed,
                                                     {'err' : 2},
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogin.php' % target_site,
                                                     cookies_needed,
                                                     None,
                                                     header)
+        get_target_website_cookies(response_last_url.cookies)
         if get_gcookies().get('UserID', {}) != 'deleted':
             set_cookie('UserID', 'deleted')
         if 'UserID' not in get_gcookies().items() and \
@@ -460,29 +471,33 @@ def save_from_static_instance_file(inputfile):
         print(error)
         raise
 
-def get_target_website_cookies(more_cookies_to_load=None):
+def get_target_website_cookies(previous_response=None):
     """
-    This function loads all supported browser cookies, and provides back the cookiejar structure
-        of all the known and saved cookies for this application's target website
-    :param 1: more_cookies_to_load represents a collection of the cookies set from the last
-        response to the previous get request
+    This function loads all supported  cookies, and provides back the cookiejar structure
+        of all the known and saved cookies for this application's target website acrossed
+        all requests.
+    :param 1: previous_response represents the previous response including the response
+        cookies of the last http request.
     :returns: cookiejar collection of all known cookies required for target website
     """
-    get_gcookies().update(browser_cookie3.load())
+    all_cookies = browser_cookie3.load()
     target = get_target_website()
     target_website1 = target.lstrip('http://').rstrip('/')
     target_website2 = target.lstrip('http://www').rstrip('/')
-    if target_website1 not in get_gcookies()._cookies and \
-        target_website2 not in get_gcookies()._cookies:
+    if target_website1 not in all_cookies._cookies and \
+        target_website2 not in all_cookies._cookies:
         return RequestsCookieJar()
     else:
-        get_gcookies().clear()
-        for cookie in browser_cookie3.load(target_website1):
-            get_gcookies().set_cookie(cookie)
-        for cookie in browser_cookie3.load(target_website2): # #Invalid URL on cookie URL missing full http://www
-            get_gcookies().set_cookie(cookie)
-        if more_cookies_to_load != None:
-            for cookie in more_cookies_to_load:
+        if len(previous_response.cookies) > 0:
+            for cookie in previous_response.cookies:
+                str_cookie_expires = 'None'
+                if cookie.expires != None:
+                    str_cookie_expires = datetime(cookie.expires).astimezone(
+                        tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
+                print('A cookie was set by the URL: {0} was found in the last http response: -> ' +
+                      'Name:{1} Value:{2} Expires:{3} Domain:{4}'.format(previous_response.url,
+                          cookie.name, cookie.value, str_cookie_expires,
+                          cookie.get_nonstandard_attr('domain', 'domain attribute not found')))
                 get_gcookies().set_cookie(cookie)
         return get_gcookies()
 
@@ -501,7 +516,7 @@ def set_cookie(key, value, minutes_expire=None):
     :param 2: value as the value of which to set for this cookie
     :param 3: minutes_expire as the number of minutes before this specificed cookie expires
     :returns: the created_cookie that was set
-    """ 
+    """
     if minutes_expire is None:
         max_age = 89 * 60 #89 minutes before expiration as the default if None is passed
     expires = datetime.strptime(
@@ -520,7 +535,7 @@ def set_cookie(key, value, minutes_expire=None):
         value #value for this cookie
         )
     browser_cookie3.chrome().set_cookie(created_cookie)
-    while key in get_target_website_cookies().items():
+    while key in get_gcookies().items():
         cookie_to_domain = get_target_website().lstrip('http://').rstrip('/')
         get_gcookies().clear(cookie_to_domain, '/', key)
     get_gcookies().set_cookie(created_cookie)

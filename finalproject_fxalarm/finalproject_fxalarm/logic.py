@@ -20,7 +20,7 @@ def get_static_usd_summary():
         currency_collection.append('USD Capture: at %s' % time_field)
     return currency_collection
 
-def get_static_usd_detail_at_timestamp():
+def get_static_usd_detail():
     """
     This database function retrieves each use instance row, and provides back the full details of
     each USD capture.
@@ -31,28 +31,29 @@ def get_static_usd_detail_at_timestamp():
         currency_collection.append(repr(row).rsplit(' timestamp=')[0])
     return currency_collection
 
-def save_static_usd_current_session_data():
+def save_static_usd_data():
     """
     This database function clears the last saved static currency data, and consecutively saves the
     USD session data from the three static sample html file sources.
     """
     if reset_currency_database() == False:
-        raise RuntimeError('The currency database table(s) was not properly cleared/reset before next run.')
+        raise RuntimeError('The currency database table(s) was not properly cleared/reset before' +
+                           'next run.')
     static_files = [
-        find_filename_by_startlookingpath(
+        find_filename_startlookingpath(
             'primary_data_index_QC-22.html',
             'finalproject_fxalarm'),
-        find_filename_by_startlookingpath(
+        find_filename_startlookingpath(
             'backup_data_heatmap_GROUP-AD.html',
             'finalproject_fxalarm'),
-        find_filename_by_startlookingpath(
+        find_filename_startlookingpath(
             'backup_data_heatmap_GROUP-ALL.html',
             'finalproject_fxalarm'),
     ]
     for file in static_files:
         parse_fxalarm.save_from_static_instance_file(file)
 
-def find_filename_by_startlookingpath(filename, startlookingpath):
+def find_filename_startlookingpath(filename, startlookingpath):
     """
     This function searches a directory tree for a single resulting filename, and from a specific
     startlookingpath directory name to start searching for this file.
@@ -72,7 +73,7 @@ def reset_currency_database():
     :Note: The calling function of this method should raise an exception if this fails!
     """
 
-    if 0 < models.USD.objects.count():
+    if models.USD.objects.count() > 0:
         models.USD.objects.all().delete()
     retval_clear_status = True if models.USD.objects.count() == 0 else False
     return retval_clear_status
