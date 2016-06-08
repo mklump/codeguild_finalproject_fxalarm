@@ -7,11 +7,9 @@ by Matthew James K on 5/16/2016
 Definition of urls for finalproject_fxalarm.
 """
 
-from datetime import datetime
 from django.contrib import admin
 from django.conf.urls import url, include
 admin.autodiscover()
-import django.contrib.auth.views
 
 from . import views
 

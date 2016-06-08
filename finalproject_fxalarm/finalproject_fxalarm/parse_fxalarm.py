@@ -205,9 +205,7 @@ def open_fxalarm_session(username_as_email, password):
                 'open_fxalarm_session(), or a login attempt at the target ' +
                 'website is not currently allowed (90min lockout).'
                 )
-        #close_fxalarm_session()
-        return_list = [login_response, get_gcookies()]
-        return return_list
+        return [login_response, get_gcookies()]
     except Exception as error:
         print(error)
         close_fxalarm_session(login_response, get_gcookies())
@@ -237,7 +235,7 @@ def request_memberarea_navigation(response_last_url, cookies_needed):
         return [response_last_url, get_gcookies()]
     except Exception as error:
         print(error)
-        close_fxalarm_session()
+        close_fxalarm_session(response_last_url, cookies_needed)
         raise
 
 def request_heatmap_navigation(response_last_url, cookies_needed):
@@ -503,8 +501,7 @@ def set_cookie(key, value, minutes_expire=None):
     :param 2: value as the value of which to set for this cookie
     :param 3: minutes_expire as the number of minutes before this specificed cookie expires
     :returns: the created_cookie that was set
-    """ # TODO: Write function to check what IP address the request object is running
-        # your code from!!!
+    """ 
     if minutes_expire is None:
         max_age = 89 * 60 #89 minutes before expiration as the default if None is passed
     expires = datetime.strptime(
@@ -524,6 +521,7 @@ def set_cookie(key, value, minutes_expire=None):
         )
     browser_cookie3.chrome().set_cookie(created_cookie)
     while key in get_target_website_cookies().items():
-        get_gcookies().clear(get_target_website().lstrip('http://').rstrip('/'), '/', key)
+        cookie_to_domain = get_target_website().lstrip('http://').rstrip('/')
+        get_gcookies().clear(cookie_to_domain, '/', key)
     get_gcookies().set_cookie(created_cookie)
     return created_cookie

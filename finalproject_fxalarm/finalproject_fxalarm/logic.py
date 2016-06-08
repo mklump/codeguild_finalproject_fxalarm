@@ -10,7 +10,8 @@ from . import parse_fxalarm
 
 def get_static_usd_summary():
     """
-    This database function retrieves each USD instance row, and provides back the timestamp summary of each USD capture.
+    This database function retrieves each USD instance row, and provides back the timestamp
+    summary of each USD capture.
     :returns: a list/array [] of strings as the summary representation of each USD instance row
     """
     currency_collection = []
@@ -21,7 +22,8 @@ def get_static_usd_summary():
 
 def get_static_usd_detail_at_timestamp():
     """
-    This database function retrieves each use instance row, and provides back the full details of each USD capture.
+    This database function retrieves each use instance row, and provides back the full details of
+    each USD capture.
     :returns: a list/array [] of strings as the full details of each USD instance row
     """
     currency_collection = []
@@ -31,24 +33,29 @@ def get_static_usd_detail_at_timestamp():
 
 def save_static_usd_current_session_data():
     """
-    This database function clears the last saved static currency data, and consecutively saves the USD session data
-    from the three static sample html file sources.
+    This database function clears the last saved static currency data, and consecutively saves the
+    USD session data from the three static sample html file sources.
     """
-    message = None
-    if False == reset_currency_database():
-        message = 'The currency database table(s) was not properly cleared/reset before next run.'
+    if reset_currency_database() == False:
+        raise RuntimeError('The currency database table(s) was not properly cleared/reset before next run.')
     static_files = [
-        find_filename_by_startlookingpath('primary_data_index_QC-22.html', 'finalproject_fxalarm'),
-        find_filename_by_startlookingpath('backup_data_heatmap_GROUP-AD.html', 'finalproject_fxalarm'),
-        find_filename_by_startlookingpath('backup_data_heatmap_GROUP-ALL.html', 'finalproject_fxalarm'),
+        find_filename_by_startlookingpath(
+            'primary_data_index_QC-22.html',
+            'finalproject_fxalarm'),
+        find_filename_by_startlookingpath(
+            'backup_data_heatmap_GROUP-AD.html',
+            'finalproject_fxalarm'),
+        find_filename_by_startlookingpath(
+            'backup_data_heatmap_GROUP-ALL.html',
+            'finalproject_fxalarm'),
     ]
     for file in static_files:
         parse_fxalarm.save_from_static_instance_file(file)
 
 def find_filename_by_startlookingpath(filename, startlookingpath):
     """
-    This function searches a directory tree for a single resulting filename, and from a specific startlookingpath directory
-    name to start searching for this file.
+    This function searches a directory tree for a single resulting filename, and from a specific
+    startlookingpath directory name to start searching for this file.
     :param 1: a string filename as the specific file single result of which to find
     :param 2: a string startlookingpath as the directory starting location to begin searching
     :returns: a string as the absolute path of where the specified file exists
@@ -67,7 +74,5 @@ def reset_currency_database():
 
     if 0 < models.USD.objects.count():
         models.USD.objects.all().delete()
-    if 0 == models.USD.objects.count():
-        return True
-    else:
-        return False
+    retval_clear_status = True if models.USD.objects.count() == 0 else False
+    return retval_clear_status
