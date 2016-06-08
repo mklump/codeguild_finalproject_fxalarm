@@ -23,6 +23,20 @@ gathering while-loop with in the view function render_dynamic_eventlogviewer() e
 that while-loop's stop condition.
 """
 
+def get_stop_execution():
+    """
+    This getter function returns the boolean global variable stop_execution.
+    :returns: stop_execution as boolean global variable while-loop stop condition
+    """
+    return stop_execution
+
+def set_stop_execution(value):
+    """
+    This setter function assigns the boolean global variable stop_execution.
+    :param 1: value as boolean literal to assign to global variable stop_execution.
+    """
+    stop_execution = value
+
 def render_home(request):
     """
     This view function renders the home page route to fxalarm_usd_index.html.
@@ -43,7 +57,7 @@ def render_static_eventlogviewer(request):
     """
     assert isinstance(request, HttpRequest)
     logic.save_static_usd_current_session_data()
-    usd_summary = logic.get_static_usd_summary_by_timestamp()
+    usd_summary = logic.get_static_usd_summary()
     usd_detail = logic.get_static_usd_detail_at_timestamp()
     return render(
         request,
@@ -63,7 +77,7 @@ def render_dynamic_eventlogviewer(request):
     assert isinstance(request, HttpRequest)
     main_execution = None
     backup_execution = None
-    if not stop_execution:
+    if not get_stop_execution():
         username_as_email = models.MyCredentials.objects.all().values(
             'username_as_email')[0]['username_as_email']
         password = models.MyCredentials.objects.all().values('password')[0]['password']
@@ -76,25 +90,25 @@ def render_dynamic_eventlogviewer(request):
         current_session = parse_fxalarm.request_heatmap_navigation(
             current_session[0], current_session[1]
             )
-        main_execution = parse_fxalarm.request_mainsource_link_navigation(
+        main_execution = parse_fxalarm.request_mainsource_link(
             current_session[0], current_session[1]
             )
-        backup_execution = parse_fxalarm.request_backupsource_link_navigation(
+        backup_execution = parse_fxalarm.request_backupsource_link(
             main_execution[0], main_execution[1]
             )
 
-    while not stop_execution:
-        current_session = parse_fxalarm.request_mainsource_data_navigation(
+    while not get_stop_execution():
+        current_session = parse_fxalarm.request_mainsource_data(
             main_execution[0], main_execution[1]
             )
-        current_session = parse_fxalarm.request_backupsource_data_navigation(
+        current_session = parse_fxalarm.request_backupsource_data(
             backup_execution[0], backup_execution[0]
             )
-        stop_execution = False
-    # endof while not stop_execution:
+    # endof while not get_stop_execution():
     parse_fxalarm.close_fxalarm_session(current_session[0], current_session[1])
+    set_stop_execution(False)
 
-    usd_summary = logic.get_static_usd_summary_by_timestamp()
+    usd_summary = logic.get_static_usd_summary()
     usd_detail = logic.get_static_usd_detail_at_timestamp()
     return render(
         request,

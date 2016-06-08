@@ -8,7 +8,7 @@ import os
 from . import models
 from . import parse_fxalarm
 
-def get_static_usd_summary_by_timestamp():
+def get_static_usd_summary():
     """
     This database function retrieves each USD instance row, and provides back the timestamp summary of each USD capture.
     :returns: a list/array [] of strings as the summary representation of each USD instance row
