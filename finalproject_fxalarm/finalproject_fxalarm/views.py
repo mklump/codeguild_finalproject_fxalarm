@@ -41,10 +41,12 @@ def render_home(request):
     """
     This view function renders the home page route to fxalarm_usd_index.html.
     """
-    assert isinstance(request, HttpRequest)
+    #assert isinstance(request, HttpRequest) For future rememberance should django ever change.
     return render(
         request,
         'finalproject_fxalarm/fxalarm_usd_index.html',
+        #This is a future reminder there are other keys here that could potentially help us.
+        #The name of this key for this convenience function is context_instance:
         context_instance=RequestContext(request, {
             'title_startscreen':'US Dollar (USD) Stream Warning',
         })
@@ -55,7 +57,6 @@ def render_static_eventlogviewer(request):
     This view function renders the static data content to the event viewer and log page route to
     fxalarm_event_log.html
     """
-    assert isinstance(request, HttpRequest)
     logic.save_static_usd_data()
     usd_summary = logic.get_static_usd_summary()
     usd_detail = logic.get_static_usd_detail()
@@ -74,7 +75,6 @@ def render_dynamic_eventlogviewer(request):
     This view function renders real-time data content to the event viewer and log page route to
     fxalarm_event_log.html
     """
-    assert isinstance(request, HttpRequest)
     main_execution = None
     backup_execution = None
     if not get_stop_execution():
@@ -126,7 +126,6 @@ def render_stop_gathering(request, stop_gathering):
     function render_dynamic_eventlogviewer() by changing the status of a global boolean variable
     named stop_execution that this while loop will be checking as a stop condition.
     """
-    assert isinstance(request, HttpRequest)
     if stop_gathering == 'True':
         stop_execution = True
     render_dynamic_eventlogviewer(request)
@@ -137,7 +136,6 @@ def render_peace_be_with_you(request):
     This view function renders a page that offers a blessing for the one person or people reading
     this page.
     """
-    assert isinstance(request, HttpRequest)
     return render(
         request,
         'finalproject_fxalarm/peace_be_with_you_farwell.html',

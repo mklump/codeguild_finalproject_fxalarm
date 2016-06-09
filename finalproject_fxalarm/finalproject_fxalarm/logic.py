@@ -51,7 +51,7 @@ def save_static_usd_data():
             'finalproject_fxalarm'),
     ]
     for file in static_files:
-        parse_fxalarm.save_from_static_instance_file(file)
+        parse_fxalarm.save_parsed_fxdata_to_usdtable(file)
 
 def find_filename_startlookingpath(filename, startlookingpath):
     """
