@@ -58,4 +58,4 @@ class USD(models.Model):
         time_field = time_field.strftime('%Y-%m-%d %H:%M:%S %Z')
         return 'EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
             ' timestamp={7}'.format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
-                                    self.USDCHF, self.AUDUSD, self.NZDUSD, '%s' % time_field)
+                                    self.USDCHF, self.AUDUSD, self.NZDUSD, time_field)

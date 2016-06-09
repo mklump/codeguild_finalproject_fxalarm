@@ -449,15 +449,15 @@ def save_parsed_fxdata_to_usdtable(inputfile):
     parse function, and saves the incomming USD data row at that moment as the save row occured.
     """
     try:
-        usd_parse = get_next_usd_parse(inputfile) #returns usd_parse list of 7 float values needed.
+        usd = get_next_usd_parse(inputfile) #returns usd_parse list of 7 float values needed.
         usd_instance = models.USD(
-            EURUSD=float(usd_parse[0].rstrip('%').split('=')[1]),
-            GBPUSD=float(usd_parse[1].rstrip('%').split('=')[1]),
-            USDJPY=float(usd_parse[2].rstrip('%').split('=')[1]),
-            USDCAD=float(usd_parse[3].rstrip('%').split('=')[1]),
-            USDCHF=float(usd_parse[4].rstrip('%').split('=')[1]),
-            AUDUSD=float(usd_parse[5].rstrip('%').split('=')[1]),
-            NZDUSD=float(usd_parse[6].rstrip('%').split('=')[1]),
+            EURUSD=float(usd[0].rstrip('%').split('=')[1]),
+            GBPUSD=float(usd[1].rstrip('%').split('=')[1]),
+            USDJPY=float(usd[2].rstrip('%').split('=')[1]),
+            USDCAD=float(usd[3].rstrip('%').split('=')[1]),
+            USDCHF=float(usd[4].rstrip('%').split('=')[1]),
+            AUDUSD=float(usd[5].rstrip('%').split('=')[1]),
+            NZDUSD=float(usd[6].rstrip('%').split('=')[1]),
             timestamp=datetime.now(tzlocal()))
         usd_instance.save()
     except Exception as error:
