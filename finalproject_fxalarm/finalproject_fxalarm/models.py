@@ -21,12 +21,13 @@ class MyCredentials(models.Model):
     target_website = models.URLField()
 
     def __str__(self):
-        return 'MyCredentials(username_as_email={0},password=\'Ask Matthew.\',' + \
-            'target_website={1}'.format(self.username_as_email, self.target_website)
+        return ('MyCredentials(username_as_email={0},password=\'Ask Matthew.\',' + \
+            'target_website={1}').format(self.username_as_email, self.target_website)
 
     def __repr__(self):
-        return 'MyCredentials(username_as_email={0},password=\'Ask Matthew.\',' + \
-            'target_website={1}'.format(self.username_as_email, self.target_website)
+        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistant
+        return ('MyCredentials(username_as_email={0},password=\'Ask Matthew.\',' + \
+            'target_website={1}').format(self.username_as_email, self.target_website)
 
 class USD(models.Model):
     """
@@ -43,8 +44,8 @@ class USD(models.Model):
     timestamp = models.DateTimeField()
 
     def __str__(self):
-        return 'EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
-            ' timestamp={7}'.format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
+        return ('EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
+            ' timestamp={7}').format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
                                     self.USDCHF, self.AUDUSD, self.NZDUSD, self.timestamp)
 
     def __repr__(self):
@@ -56,6 +57,7 @@ class USD(models.Model):
             raise RuntimeError(error)
 
         time_field = time_field.strftime('%Y-%m-%d %H:%M:%S %Z')
-        return 'EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
-            ' timestamp={7}'.format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
+        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistant
+        return ('EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
+            ' timestamp={7}').format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
                                     self.USDCHF, self.AUDUSD, self.NZDUSD, time_field)

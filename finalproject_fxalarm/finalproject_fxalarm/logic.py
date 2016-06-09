@@ -8,7 +8,7 @@ import os
 from . import models
 from . import parse_fxalarm
 
-def get_static_usd_summary():
+def get_usd_summary():
     """
     This database function retrieves each USD instance row, and provides back the timestamp
     summary of each USD capture.
@@ -20,7 +20,7 @@ def get_static_usd_summary():
         currency_collection.append('USD Capture: at %s' % time_field)
     return currency_collection
 
-def get_static_usd_detail():
+def get_usd_detail():
     """
     This database function retrieves each use instance row, and provides back the full details of
     each USD capture.

@@ -58,8 +58,8 @@ def render_static_eventlogviewer(request):
     fxalarm_event_log.html
     """
     logic.save_static_usd_data()
-    usd_summary = logic.get_static_usd_summary()
-    usd_detail = logic.get_static_usd_detail()
+    usd_summary = logic.get_usd_summary()
+    usd_detail = logic.get_usd_detail()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
@@ -81,35 +81,24 @@ def render_dynamic_eventlogviewer(request):
         username_as_email = models.MyCredentials.objects.all().values(
             'username_as_email')[0]['username_as_email']
         password = models.MyCredentials.objects.all().values('password')[0]['password']
-        current_session = parse_fxalarm.open_fxalarm_session(
+        last_response = parse_fxalarm.open_fxalarm_session(
             username_as_email, password
             )
-        current_session = parse_fxalarm.request_memberarea_navigation(
-            current_session[0], current_session[1]
-            )
-        current_session = parse_fxalarm.request_heatmap_navigation(
-            current_session[0], current_session[1]
-            )
-        main_execution = parse_fxalarm.request_mainsource_link(
-            current_session[0], current_session[1]
-            )
-        backup_execution = parse_fxalarm.request_backupsource_link(
-            main_execution[0], main_execution[1]
-            )
+        last_response = parse_fxalarm.request_memberarea_navigation(last_response)
+        get_the_link_response = parse_fxalarm.request_heatmap_navigation(last_response)
+        main_response = parse_fxalarm.request_mainsource_link(get_the_link_response)
+        backup_response = parse_fxalarm.request_backupsource_link(get_the_link_response)
 
     while not get_stop_execution():
-        current_session = parse_fxalarm.request_mainsource_data(
-            main_execution[0], main_execution[1]
-            )
-        current_session = parse_fxalarm.request_backupsource_data(
-            backup_execution[0], backup_execution[0]
-            )
+        last_response = parse_fxalarm.request_mainsource_data(main_response)
+        last_response = parse_fxalarm.request_backupsource_data(backup_response)
     # endof while not get_stop_execution():
-    parse_fxalarm.close_fxalarm_session(current_session[0], current_session[1])
+
+    parse_fxalarm.close_fxalarm_session(last_response)
     set_stop_execution(False)
 
-    usd_summary = logic.get_static_usd_summary()
-    usd_detail = logic.get_static_usd_detail()
+    usd_summary = logic.get_usd_summary()
+    usd_detail = logic.get_usd_detail()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',

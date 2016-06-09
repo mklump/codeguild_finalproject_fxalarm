@@ -22,7 +22,7 @@ The gfx_alarm_session global variable represents the session request/response th
 get_alarm_session.get() or post() function call. (must be initialized in this scope)
 """
 
-def get_fxalarm_session(): #TODO: fix every call to get_gcookies() to get_fxalarm_session()
+def get_fxalarm_session():
     """
     This is the get function for the global variable gcookies.
     """
@@ -58,7 +58,7 @@ def parse_currency_node(html_parser, currency_symbol):
     html snapshot GET request or file
     """
     match = html_parser.find(string=currency_symbol)
-    return '{0}={1}'.format(match, match.next_element.next_element.string)
+    return ('{0}={1}').format(match, match.next_element.next_element.string)
 
 def get_next_usd_parse(input_file):
     """
@@ -101,34 +101,36 @@ def get_target_website():
 
 def check_next_http_request(response_last_url,
                             request_url,
-                            cookies_needed=None,
+                            is_get_http_request=True,
                             request_params=None,
                             headers=None):
     """
-    This function accepts a request_url, request_params, and cookies_needed for the next http
+    This function accepts a request_url, request_params, and is_get_http_request for the next http
     request, checks if the url is 'executable', and then passes it to execute_next_http_request()
     with all the parameters if the complete path can be reached.
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the
         next Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be checked
-    :param 3: cookies_needed CookieJar (optional) dictionary to be used with this request execution
+    :param 3: is_get_http_request as a bool is a flag that will execute this request as a GET
+        http request if the flag is True, otherwise the request will be a POST if it is False
     :param 4: request_params (optional) to be used with this request execution
     :param 5: headers (optional) dictionary that must be included with this request execution such
         as tracked Referers
     :returns: the returned requests.response object if all went well
     """
     try:
-        response_last_url = requests.get(request_url)
-        if response_last_url.status_code == 200:
+        response_last_url = get_fxalarm_session().get(request_url)
+        if response_last_url.status_code < 400:
             response_last_url = execute_next_http_request(
-                request_url,    # required for all requests
-                cookies_needed, # required for all requests
-                request_params, # required for most requests
-                headers,        # required for all requests
+                response_last_url,   # required for main and backup data requests
+                request_url,         # required for all requests
+                is_get_http_request, # required for all requests
+                request_params,      # required for most requests
+                headers,             # required for all requests
                 )
         else:
             raise RuntimeError(
-                'The request_url {0} returned status: {1}'.format(
+                ('The request_url {0} returned status: {1}').format(
                     request_url,
                     response_last_url.status_code))
         return response_last_url
@@ -138,37 +140,42 @@ def check_next_http_request(response_last_url,
 
 def execute_next_http_request(response_last_url,
                               request_url,
-                              cookies_needed=None,
+                              is_get_http_request=True,
                               request_params=None,
                               headers=None):
     """
-    This fuction accepts a request_url, request_params, and cookies_needed for the next http
-    request, and executes the full url with the get request parameters, and cookies collection to
-    ensure the response was timly, and that the response has the correct response code. If it does,
+    This fuction accepts a request_url, request_params, and is_get_http_request for the next http
+    request, and executes the full url all the needed request argument sesstings. If it does,
     then the requests.reponse object is handed back to the next request.
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the
         next Requests.Get() while streaming Requests.Reponse.text
     :param 2: request_url as the complete url to be executed
-    :param 3: cookies_needed CookieJar (optional) dictionary to be used with this request execution
+    :param 3: is_get_http_request as a bool is a flag that will execute this request as a GET
+        http request if the flag is True, otherwise the request will be a POST if it is False
     :param 4: request_params (optional) to be used with this request execution
     :param 5: headers (optional) dictionary that must be included with this request execution such
         as tracked Referers
-    :returns: the returned requests.response object if all went well
+    :returns: the requests.response object of the requests.Session.Get()/.Post() if all went well
     """
     try:
-        response_last_url = requests.get(
-            request_url,            # required for all requests
-            cookies=cookies_needed, # required for all requests
-            data=request_params,    # required for most requests
-            headers=headers,        # required for all requests
-            )
+        if is_get_http_request:
+            response_last_url = get_fxalarm_session().get(
+                request_url,             # required for all requests
+                data=request_params,     # required for most requests
+                headers=headers,         # required for all requests
+                )
+        else:
+            response_last_url = get_fxalarm_session().post(
+                request_url,             # required for all requests
+                data=request_params,     # required for most requests
+                headers=headers,         # required for all requests
+                )
         log_changed_cookies(response_last_url)
-        if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code != 200:
-            raise RuntimeError('The http request url: {0}, with cookies: ' +
-                               '{1}, with get request data: {2}, and with headers: {3}' +
-                               ' has failed with status code: {4}, and taking {5} seconds ' +
-                               'amount of time to see a ' +
-                               'response.'.format(request_url, cookies_needed,
+        if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code >= 400:
+            raise RuntimeError(('The http request url: {0}, with cookies: {1}, with get request ' +
+                                'data: {2}, and with headers: {3} has failed with status code: ' +
+                                '{4}, and taking {5} seconds amount of time to see a ' +
+                                'response.').format(request_url, get_fxalarm_session().cookies,
                                                   request_params, headers,
                                                   response_last_url.status_code,
                                                   response_last_url.elapsed.total_seconds()))
@@ -184,10 +191,9 @@ def open_fxalarm_session(username_as_email, password):
     :param 1: username_as_email as the secure credentials email as username from the database with
         the request
     :param 2: password as the secure credentials password from the database with the request
-    :returns: a list of login_response, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: login_response that this attempted login through requests.session.post() received
     """
-    login_response = None
+    response_last_url = None
     try:
         form_post_params = {
             'vchEmail': username_as_email,
@@ -197,78 +203,73 @@ def open_fxalarm_session(username_as_email, password):
         }
         target_site = get_target_website()
         header = {'Referer':'%slogin' % target_site}
-        login_response = requests.post('%slogin' % target_site, #First POST request to opensession
-                                       data=form_post_params,
-                                       cookies=get_gcookies(),
-                                       headers=header)
-        log_changed_cookies(login_response)
-        if login_response.cookies.get('UserID', {}) != '9951':
+        response_last_url = check_next_http_request(None,                    #No previous response
+                                                    '%slogin' % target_site, #First POST request
+                                                    False,                   #POST request, not GET
+                                                    form_post_params, #Dictionary of POST logindata
+                                                    header)           #Referer header entry
+        log_changed_cookies(response_last_url)
+        if response_last_url.cookies.get('UserID', {}) != '9951':
             raise RuntimeError(
                 'The login operation failed in the function ' +
                 'open_fxalarm_session(), or a login attempt at the target ' +
                 'website is not currently allowed (90min lockout).'
                 )
-        return [login_response, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(login_response, get_gcookies())
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_memberarea_navigation(response_last_url, cookies_needed):
+def request_memberarea_navigation(response_last_url):
     """
     This function request navigation immediately follows after open_fxalarm_session(), but before
         request_heatmap_navigation() to step the requests mock browser object through the required
         click web links to the main streaming html page.
     :param 1: response_last_url is the Request.Response object instance that was passed from
         the last call to open_fxalarm_session()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from
-        the last call to open_fxalarm_session()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
         target_site = get_target_website()
         header = {'Referer':'%slogin' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%smember-area.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_heatmap_navigation(response_last_url, cookies_needed):
+def request_heatmap_navigation(response_last_url):
     """
     This function request navigation immediately follows after request_memberarea_navigation(),
         but before request_mainsource_link() to step the requests mock browser object
         through the required click web links to the main streaming html page.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_memberarea_navigation()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to request_memberarea_navigation()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
         target_site = get_target_website()
         header = {'Referer':'%smember-area.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%sheatmap.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_mainsource_link(response_last_url, cookies_needed):
+def request_mainsource_link(response_last_url):
     """
     This function request navigation immediately follows after request_heatmap_navigation(),
         but before request_mainsource_data(). This function is responsible for finding
@@ -276,27 +277,24 @@ def request_mainsource_link(response_last_url, cookies_needed):
         functions that are not part of this request.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_heatmap_navigation()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to request_heatmap_navigation()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%sget_v4.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_mainsource_data(response_last_url, cookies_needed):
+def request_mainsource_data(response_last_url):
     """
     This function request navigation immediately follows after
     request_mainsource_link(), but before request_backupsource_link().
@@ -306,10 +304,7 @@ def request_mainsource_data(response_last_url, cookies_needed):
         looking for!
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_link()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to request_mainsource_link()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.post() received
     """
     try:
         threading.current_thread().join(timeout=15) # Wait here 15 seconds before proceeding.
@@ -319,22 +314,21 @@ def request_mainsource_data(response_last_url, cookies_needed):
         response_last_url.encoding = 'utf-8'
         soup_html_parser = BeautifulSoup(response_last_url.text, 'html.parser')
         primary_source_url = soup_html_parser.find(string='acForm').next_sibling.string
-        response_last_url = check_next_http_request(response_last_url,
+        response_last_url = check_next_http_request(response_last_url, # Second POST request
                                                     primary_source_url,
-                                                    cookies_needed,
-                                                    None,
+                                                    False,
+                                                    form_post_data,
                                                     header)
         log_changed_cookies(response_last_url)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
-        close_fxalarm_session(response_last_url, cookies_needed) # TODO: Remove after testing
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_backupsource_link(response_last_url, cookies_needed):
+def request_backupsource_link(response_last_url):
     """
     This function request navigation (Asian Session Only <group=all> not European Session
         <group=ad>) immediately follows after request_mainsource_data(), but before
@@ -343,10 +337,7 @@ def request_backupsource_link(response_last_url, cookies_needed):
         functions that are not part of this request.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_data()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to request_mainsource_data()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
         target_site = get_target_website()
@@ -354,17 +345,17 @@ def request_backupsource_link(response_last_url, cookies_needed):
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%sget.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     form_post_params,
                                                     header)
         log_changed_cookies(response_last_url)
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def request_backupsource_data(response_last_url, cookies_needed):
+def request_backupsource_data(response_last_url):
     """
     This function request navigation (Asian Session Only <group=all> not European Session
         <group=ad>) immediately follows after request_backupsource_link(), but before
@@ -373,10 +364,7 @@ def request_backupsource_data(response_last_url, cookies_needed):
         page in case of the event that the main source html page were to fail to respond.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_backupsource_link()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to request_backupsource_link()
-    :returns: a list of response_last_url, and the gcookies global cookies instances that were
-        created which determines the active session
+    :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
         response_last_url.encoding = 'utf-8'
@@ -384,40 +372,37 @@ def request_backupsource_data(response_last_url, cookies_needed):
         unescaped_string = urllib.parse.unquote_plus(escaped_string)
         backup_source_url = re.match('.*\n.*iframe src="(.+)"  height=.*\n.*',
                                      unescaped_string).group(1)
-        #form_post_params = { 'group' : 'all' }
         referer = re.match('(.+)(heatmap.php.+)', backup_source_url).group(1)
         header = {'Referer':referer}
         response_last_url = check_next_http_request(response_last_url,
                                                     backup_source_url,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
         response_last_url.encoding = 'utf-8'
         #Backup data!  -> backup data source .save()
         save_parsed_fxdata_to_usdtable(response_last_url.text)
-        return [response_last_url, get_gcookies()]
+        return response_last_url
     except Exception as error:
         print(error)
-        close_fxalarm_session(response_last_url, cookies_needed)
+        close_fxalarm_session(response_last_url)
         raise
 
-def close_fxalarm_session(response_last_url, cookies_needed):
+def close_fxalarm_session(response_last_url):
     """
     This function checks if a current fxalarm session is active and closes it by executing 3 http
         requests.get() calls to properly logout.
     ALL OF THESE 3 REQUESTS MUST HAPPEN TOGETHER AS ONE UNIT, NOT ONE APART.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
-        last call to open_fxalarm_session()
-    :param 2: cookies_needed is the RequestsCookieJar object instance that was passed from the
-        last call to open_fxalarm_session()
+        last http request
     """
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogout.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
@@ -425,18 +410,18 @@ def close_fxalarm_session(response_last_url, cookies_needed):
             #response_last_url,'%slogout.php' % target_site) #original request
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogin.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     {'err' : 2},
                                                     header)
         log_changed_cookies(response_last_url)
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogin.php' % target_site,
-                                                    cookies_needed,
+                                                    True,
                                                     None,
                                                     header)
         log_changed_cookies(response_last_url)
-        if 'UserID' not in get_gcookies().items() and \
-            get_gcookies().get('UserID', {}) != 'deleted':
+        if 'UserID' not in get_fxalarm_session().cookies.items() and \
+            get_fxalarm_session().cookies.get('UserID', {}) != 'deleted':
             raise RuntimeError('The logout operation failed in the function ' +
                                'close_fxalarm_session().')
     except Exception as error:
@@ -449,15 +434,15 @@ def save_parsed_fxdata_to_usdtable(inputfile):
     parse function, and saves the incomming USD data row at that moment as the save row occured.
     """
     try:
-        usd = get_next_usd_parse(inputfile) #returns usd_parse list of 7 float values needed.
+        usd_parse = get_next_usd_parse(inputfile) #returns usd_parse list of 7 float values needed.
         usd_instance = models.USD(
-            EURUSD=float(usd[0].rstrip('%').split('=')[1]),
-            GBPUSD=float(usd[1].rstrip('%').split('=')[1]),
-            USDJPY=float(usd[2].rstrip('%').split('=')[1]),
-            USDCAD=float(usd[3].rstrip('%').split('=')[1]),
-            USDCHF=float(usd[4].rstrip('%').split('=')[1]),
-            AUDUSD=float(usd[5].rstrip('%').split('=')[1]),
-            NZDUSD=float(usd[6].rstrip('%').split('=')[1]),
+            EURUSD=float(usd_parse[0].rstrip('%').split('=')[1]),
+            GBPUSD=float(usd_parse[1].rstrip('%').split('=')[1]),
+            USDJPY=float(usd_parse[2].rstrip('%').split('=')[1]),
+            USDCAD=float(usd_parse[3].rstrip('%').split('=')[1]),
+            USDCHF=float(usd_parse[4].rstrip('%').split('=')[1]),
+            AUDUSD=float(usd_parse[5].rstrip('%').split('=')[1]),
+            NZDUSD=float(usd_parse[6].rstrip('%').split('=')[1]),
             timestamp=datetime.now(tzlocal()))
         usd_instance.save()
     except Exception as error:
@@ -471,7 +456,6 @@ def log_changed_cookies(previous_response=None):
         target website while an active session is in progress.
     :param 1: previous_response represents the previous response including the response
         cookies of the last http request.
-    :returns: cookiejar collection of all known cookies required for target website
     """
     all_cookies = browser_cookie3.load()
     target = get_target_website()
@@ -486,21 +470,20 @@ def log_changed_cookies(previous_response=None):
                 str_cookie_expires = 'None'
                 if cookie.expires != None:
                     str_cookie_expires = datetime(cookie.expires).astimezone(
-                        tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z') #TODO: TEST .astimezone()?
-                log_line = 'A cookie was set by the URL: {0} was found in the last http ' + \
-                    'response: -> Name:{1} Value:{2} Expires:{3} Domain:{4}.\n'.format(
+                        tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
+                log_line = ('A cookie was set by the URL: {0} was found in the last http ' + \
+                    'response: -> Name:{1} Value:{2} Expires:{3} Domain:{4}.\n').format(
                         previous_response.url, cookie.name, cookie.value, str_cookie_expires,
                           cookie.get_nonstandard_attr('domain', 'domain attribute not found'))
                 print(log_line)
                 with open('session_cookie_log.txt', mode='+a') as cookie_log:
                     cookie_log.writelines([log_line]) #append a single line on this cookie change
                 #end with open('session_cookie_log.txt') block close cookie_log obj for next one
-        return get_gcookies()
 
 def set_cookie(key, value, minutes_expire=None):
     """
     This function sets the specified cookie using the specified key to the specified value with
-        the specified expiration of 89 minutes as the default.
+        the specified expiration of 89 minutes as the default. Do not remove yet! -> Future Need
     :param 1: key as the cookie key as the name of this cookie
     :param 2: value as the value of which to set for this cookie
     :param 3: minutes_expire as the number of minutes before this specificed cookie expires
