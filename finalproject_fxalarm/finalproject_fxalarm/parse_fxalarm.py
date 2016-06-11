@@ -16,6 +16,21 @@ import requests
 from bs4 import BeautifulSoup
 from . import models
 
+"""
+ERROR1->
+error: cannot join current thread?!?
+
+ERROR2-> SESSION LOG OUT FAILED->
+Cookies in recorder request:
+__utmt=1;
+PHPSESSID=596746e0154e6a81d6b1a70b860a1106;
+__utma=84688270.2071886986.1465192918.1465200011.1465285721.4;
+__utmb=84688270.3.10.1465285721;
+__utmc=84688270;
+__utmz=84688270.1465192918.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided);
+UserID=knownuseridnumber
+"""
+
 gfx_alarm_session = requests.Session()
 """
 The gfx_alarm_session global variable represents the session request/response throughput for every
@@ -24,7 +39,7 @@ get_alarm_session.get() or post() function call. (must be initialized in this sc
 
 def get_fxalarm_session():
     """
-    This is the get function for the global variable gcookies.
+    This is the get function for the global variable gfx_alarm_session.
     """
     return gfx_alarm_session
 
@@ -78,6 +93,7 @@ def set_fxalarm_db_login(username, pwd, website):
     This function can only be run currenlt from a python interactive console.
     This function accepts 3 parameters, to save to the MyCredentials database table for access by
     this program - username_as_email, password, and target_website.
+    Do not remove this function! This is for future use to add this one row without the admin page.
     :param 1: username as string to save to username_as_email
     :param 2: pwd as string to save to password
     :param 3: website as string to save to target_website
@@ -126,7 +142,7 @@ def check_next_http_request(response_last_url,
                 request_url,         # required for all requests
                 is_get_http_request, # required for all requests
                 request_params,      # required for most requests
-                headers,             # required for all requests
+                headers              # required for all requests
                 )
         else:
             raise RuntimeError(
@@ -162,13 +178,13 @@ def execute_next_http_request(response_last_url,
             response_last_url = get_fxalarm_session().get(
                 request_url,             # required for all requests
                 data=request_params,     # required for most requests
-                headers=headers,         # required for all requests
+                headers=headers          # required for all requests
                 )
         else:
             response_last_url = get_fxalarm_session().post(
                 request_url,             # required for all requests
                 data=request_params,     # required for most requests
-                headers=headers,         # required for all requests
+                headers=headers          # required for all requests
                 )
         log_changed_cookies(response_last_url)
         if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code >= 400:
@@ -308,7 +324,7 @@ def request_mainsource_data(response_last_url):
     """
     try:
         threading.current_thread().join(timeout=15) # Wait here 15 seconds before proceeding.
-        target_site = get_target_website()
+        target_site = get_target_website()          # error: cannot join current thread?!?
         header = {'Referer':'%sget_v4.php' % target_site}
         form_post_data = {'ak', uuid.uuid4().hex}
         response_last_url.encoding = 'utf-8'
@@ -469,12 +485,11 @@ def log_changed_cookies(previous_response=None):
             for cookie in previous_response.cookies:
                 str_cookie_expires = 'None'
                 if cookie.expires != None:
-                    str_cookie_expires = datetime(cookie.expires).astimezone(
-                        tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
+                    str_cookie_expires = datetime.fromtimestamp(
+                        cookie.expires).replace(tzinfo=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
                 log_line = ('A cookie was set by the URL: {0} was found in the last http ' + \
-                    'response: -> Name:{1} Value:{2} Expires:{3} Domain:{4}.\n').format(
-                        previous_response.url, cookie.name, cookie.value, str_cookie_expires,
-                          cookie.get_nonstandard_attr('domain', 'domain attribute not found'))
+                    'response: -> Name:{1} Value:{2} Expires:{3}.\n').format(
+                        previous_response.url, cookie.name, cookie.value, str_cookie_expires)
                 print(log_line)
                 with open('session_cookie_log.txt', mode='+a') as cookie_log:
                     cookie_log.writelines([log_line]) #append a single line on this cookie change
@@ -493,7 +508,7 @@ def set_cookie(key, value, minutes_expire=None):
         max_age = 89 * 60 #89 minutes before expiration as the default if None is passed
     expires = datetime.strptime(
         datetime.strftime(
-            datetime.now(tzlocal()) +
+            datetime.now(tz=tzlocal()) +
             timedelta(seconds=max_age),
             "%a, %d-%b-%Y %H:%M:%S %Z"),
         "%a, %d-%b-%Y %H:%M:%S %Z"
@@ -507,3 +522,11 @@ def set_cookie(key, value, minutes_expire=None):
         value #value for this cookie
         )
     return created_cookie
+
+def erase_saved_cookielogfile():
+    """
+    This function erases the saved log file 'session_cookie_log.txt' in the project root.
+    """
+    with open('session_cookie_log.txt', mode='+w') as wiped:
+        wiped.writelines([('This cookie log file was last cleared on: {0}').format(
+            datetime.now(tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z'))])
