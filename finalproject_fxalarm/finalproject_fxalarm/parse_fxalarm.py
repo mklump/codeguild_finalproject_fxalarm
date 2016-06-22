@@ -5,31 +5,18 @@ by Matthew James K on 5/25/2016
 """
 import re
 import urllib
-import threading
+import time
+import logging
 import uuid
 from datetime import datetime
 from datetime import timedelta
 from requests.cookies import RequestsCookieJar
+from http.cookiejar import Cookie
 from dateutil.tz import tzlocal
 import browser_cookie3
 import requests
 from bs4 import BeautifulSoup
 from . import models
-
-"""
-ERROR1->
-error: cannot join current thread?!?
-
-ERROR2-> SESSION LOG OUT FAILED->
-Cookies in recorder request:
-__utmt=1;
-PHPSESSID=596746e0154e6a81d6b1a70b860a1106;
-__utma=84688270.2071886986.1465192918.1465200011.1465285721.4;
-__utmb=84688270.3.10.1465285721;
-__utmc=84688270;
-__utmz=84688270.1465192918.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided);
-UserID=knownuseridnumber
-"""
 
 gfx_alarm_session = requests.Session()
 """
@@ -135,20 +122,23 @@ def check_next_http_request(response_last_url,
     :returns: the returned requests.response object if all went well
     """
     try:
-        response_last_url = get_fxalarm_session().get(request_url)
-        if response_last_url.status_code < 400:
-            response_last_url = execute_next_http_request(
-                response_last_url,   # required for main and backup data requests
-                request_url,         # required for all requests
-                is_get_http_request, # required for all requests
-                request_params,      # required for most requests
-                headers              # required for all requests
-                )
+        if is_get_http_request:
+            response_last_url = get_fxalarm_session().get(request_url)
         else:
+            response_last_url = get_fxalarm_session().post(request_url)
+        if response_last_url != None and response_last_url.status_code >= 400:
             raise RuntimeError(
                 ('The request_url {0} returned status: {1}').format(
                     request_url,
                     response_last_url.status_code))
+
+        response_last_url = execute_next_http_request(
+            response_last_url,   # required for main and backup data requests
+            request_url,         # required for all requests
+            is_get_http_request, # required for all requests
+            request_params,      # required for most requests
+            headers              # required for all requests
+            )
         return response_last_url
     except Exception as error:
         print(error)
@@ -224,8 +214,7 @@ def open_fxalarm_session(username_as_email, password):
                                                     False,                   #POST request, not GET
                                                     form_post_params, #Dictionary of POST logindata
                                                     header)           #Referer header entry
-        log_changed_cookies(response_last_url)
-        if response_last_url.cookies.get('UserID', {}) != '9951':
+        if get_fxalarm_session().cookies.get('UserID', None) == None:
             raise RuntimeError(
                 'The login operation failed in the function ' +
                 'open_fxalarm_session(), or a login attempt at the target ' +
@@ -254,7 +243,6 @@ def request_memberarea_navigation(response_last_url):
                                                     True,
                                                     None,
                                                     header)
-        log_changed_cookies(response_last_url)
         return response_last_url
     except Exception as error:
         print(error)
@@ -278,7 +266,6 @@ def request_heatmap_navigation(response_last_url):
                                                     True,
                                                     None,
                                                     header)
-        log_changed_cookies(response_last_url)
         return response_last_url
     except Exception as error:
         print(error)
@@ -303,7 +290,6 @@ def request_mainsource_link(response_last_url):
                                                     True,
                                                     None,
                                                     header)
-        log_changed_cookies(response_last_url)
         return response_last_url
     except Exception as error:
         print(error)
@@ -323,19 +309,18 @@ def request_mainsource_data(response_last_url):
     :returns: response_last_url that this attempted requests.session.post() received
     """
     try:
-        threading.current_thread().join(timeout=15) # Wait here 15 seconds before proceeding.
-        target_site = get_target_website()          # error: cannot join current thread?!?
+        time.sleep(15) # Wait here 15 seconds before proceeding.
+        target_site = get_target_website()
         header = {'Referer':'%sget_v4.php' % target_site}
-        form_post_data = {'ak', uuid.uuid4().hex}
+        form_post_data = {'ak':uuid.uuid4().hex}
         response_last_url.encoding = 'utf-8'
         soup_html_parser = BeautifulSoup(response_last_url.text, 'html.parser')
-        primary_source_url = soup_html_parser.find(string='acForm').next_sibling.string
-        response_last_url = check_next_http_request(response_last_url, # Second POST request
+        primary_source_url = soup_html_parser.find(attrs={'id' : 'acForm'}).attrs['action']
+        response_last_url = check_next_http_request(response_last_url, # Second POST request -> TODO: ERROR: a bytes-like object is required, not 'str'
                                                     primary_source_url,
                                                     False,
                                                     form_post_data,
                                                     header)
-        log_changed_cookies(response_last_url)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
         return response_last_url
@@ -364,7 +349,6 @@ def request_backupsource_link(response_last_url):
                                                     True,
                                                     form_post_params,
                                                     header)
-        log_changed_cookies(response_last_url)
         return response_last_url
     except Exception as error:
         print(error)
@@ -395,7 +379,6 @@ def request_backupsource_data(response_last_url):
                                                     True,
                                                     None,
                                                     header)
-        log_changed_cookies(response_last_url)
         response_last_url.encoding = 'utf-8'
         #Backup data!  -> backup data source .save()
         save_parsed_fxdata_to_usdtable(response_last_url.text)
@@ -416,32 +399,36 @@ def close_fxalarm_session(response_last_url):
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
+        fxalarm_session = get_fxalarm_session().cookies.set(
+            'UserID', 'deleted',
+            domain=target_site.lstrip('http://').rstrip('/'), path='/') #Kill the session now!
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogout.php' % target_site,
                                                     True,
                                                     None,
                                                     header)
-        log_changed_cookies(response_last_url)
-        #response_last_url = check_next_http_request(
-            #response_last_url,'%slogout.php' % target_site) #original request
         response_last_url = check_next_http_request(response_last_url,
                                                     '%slogin.php' % target_site,
                                                     True,
                                                     {'err' : 2},
                                                     header)
-        log_changed_cookies(response_last_url)
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%slogin.php' % target_site,
-                                                    True,
-                                                    None,
-                                                    header)
-        log_changed_cookies(response_last_url)
-        if 'UserID' not in get_fxalarm_session().cookies.items() and \
-            get_fxalarm_session().cookies.get('UserID', {}) != 'deleted':
+
+        if 'UserID' in get_fxalarm_session().cookies.items():
             raise RuntimeError('The logout operation failed in the function ' +
-                               'close_fxalarm_session().')
+                               'close_fxalarm_session(). Cookie name=UserID was present - ' +
+                               'please wait 90min to login again, and contact support.')
     except Exception as error:
         print(error)
+        response_last_url = check_next_http_request(response_last_url,
+                                            '%slogout.php' % target_site,
+                                            True,
+                                            None,
+                                            header)
+        response_last_url = check_next_http_request(response_last_url,
+                                            '%slogin.php' % target_site,
+                                            True,
+                                            {'err' : 2},
+                                            header)
         raise
 
 def save_parsed_fxdata_to_usdtable(inputfile):
@@ -478,7 +465,8 @@ def log_changed_cookies(previous_response=None):
     target_website1 = target.lstrip('http://').rstrip('/')
     target_website2 = target.lstrip('http://www').rstrip('/')
     if target_website1 not in all_cookies._cookies and \
-        target_website2 not in all_cookies._cookies:
+        target_website2 not in all_cookies._cookies and \
+        len(previous_response.cookies) == 0:
         return RequestsCookieJar()
     else:
         if len(previous_response.cookies) > 0:
@@ -487,8 +475,8 @@ def log_changed_cookies(previous_response=None):
                 if cookie.expires != None:
                     str_cookie_expires = datetime.fromtimestamp(
                         cookie.expires).replace(tzinfo=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
-                log_line = ('A cookie was set by the URL: {0} was found in the last http ' + \
-                    'response: -> Name:{1} Value:{2} Expires:{3}.\n').format(
+                log_line = ('\nA cookie was set by the URL: {0} was found in the last http ' + \
+                    'response: -> Name:{1} Value:{2} Expires:{3}.').format(
                         previous_response.url, cookie.name, cookie.value, str_cookie_expires)
                 print(log_line)
                 with open('session_cookie_log.txt', mode='+a') as cookie_log:

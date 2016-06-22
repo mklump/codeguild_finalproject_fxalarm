@@ -14,8 +14,8 @@ admin.autodiscover()
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.render_home, name='home'),
-    #url(r'^$', views.render_dynamic_eventlogviewer, name = 'home'),
+    #url(r'^$', views.render_home, name='home'),
+    url(r'^$', views.render_dynamic_eventlogviewer, name = 'home'),
 
     #url(r'^viewer$|^event_viewer$|^log$', views.render_static_eventlogviewer, name='event_viewer'),
     url(r'^viewer$|^event_viewer$|^log$', views.render_dynamic_eventlogviewer, name='event_viewer'),

@@ -16,7 +16,7 @@ from . import logic
 from . import models
 from . import parse_fxalarm
 
-stop_execution = True
+stop_execution = False
 """
 This global boolean variable in this views.py file will be evaluated each time the main data
 gathering while-loop with in the view function render_dynamic_eventlogviewer() executes as
