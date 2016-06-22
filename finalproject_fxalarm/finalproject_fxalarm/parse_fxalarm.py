@@ -8,6 +8,7 @@ import urllib
 import time
 import logging
 import uuid
+import random
 from datetime import datetime
 from datetime import timedelta
 from requests.cookies import RequestsCookieJar
@@ -102,43 +103,20 @@ def get_target_website():
     """
     return models.MyCredentials.objects.all().values('target_website')[0]['target_website']
 
-def check_next_http_request(response_last_url,
-                            request_url,
-                            is_get_http_request=True,
-                            request_params=None,
-                            headers=None):
+def check_http_response(target_request_url):
     """
-    This function accepts a request_url, request_params, and is_get_http_request for the next http
-    request, checks if the url is 'executable', and then passes it to execute_next_http_request()
-    with all the parameters if the complete path can be reached.
-    :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the
-        next Requests.Get() while streaming Requests.Reponse.text
-    :param 2: request_url as the complete url to be checked
-    :param 3: is_get_http_request as a bool is a flag that will execute this request as a GET
-        http request if the flag is True, otherwise the request will be a POST if it is False
-    :param 4: request_params (optional) to be used with this request execution
-    :param 5: headers (optional) dictionary that must be included with this request execution such
-        as tracked Referers
-    :returns: the returned requests.response object if all went well
+    This function accepts a target_request_url and checks if the url is 'executable', and has
+    correct responsiveness based on the response status code.
+    :param 1: target_request_url as a string of the complete url to be checked for responsiveness
+    :returns: the returned requests.session.response object if all went well
     """
     try:
-        if is_get_http_request:
-            response_last_url = get_fxalarm_session().get(request_url)
-        else:
-            response_last_url = get_fxalarm_session().post(request_url)
+        response_last_url = get_fxalarm_session().get(target_request_url)
         if response_last_url != None and response_last_url.status_code >= 400:
             raise RuntimeError(
                 ('The request_url {0} returned status: {1}').format(
                     request_url,
                     response_last_url.status_code))
-
-        response_last_url = execute_next_http_request(
-            response_last_url,   # required for main and backup data requests
-            request_url,         # required for all requests
-            is_get_http_request, # required for all requests
-            request_params,      # required for most requests
-            headers              # required for all requests
-            )
         return response_last_url
     except Exception as error:
         print(error)
@@ -188,32 +166,34 @@ def execute_next_http_request(response_last_url,
         return response_last_url
     except Exception as error:
         print(error)
+        close_fxalarm_session(response_last_url)
         raise
 
-def open_fxalarm_session(username_as_email, password):
+def open_fxalarm_session(username_as_email, password, response_last_url):
     """
     This function reads the MyCredentials table for the existance of 1 row, and starts a new
         active session.
     :param 1: username_as_email as the secure credentials email as username from the database with
         the request
     :param 2: password as the secure credentials password from the database with the request
+    :param 3: response_last_url is the Requests.Response of the last Requests.Get for use in the
+        next Requests.Get() while streaming Requests.Reponse.text
     :returns: login_response that this attempted login through requests.session.post() received
     """
-    response_last_url = None
     try:
         form_post_params = {
             'vchEmail': username_as_email,
             'vchPassword': password,
-            'x':37,
-            'y':10,
+            'x':random.randint(1, 49),
+            'y':random.randint(1, 19),
         }
         target_site = get_target_website()
         header = {'Referer':'%slogin' % target_site}
-        response_last_url = check_next_http_request(None,                    #No previous response
-                                                    '%slogin' % target_site, #First POST request
-                                                    False,                   #POST request, not GET
-                                                    form_post_params, #Dictionary of POST logindata
-                                                    header)           #Referer header entry
+        response_last_url = execute_next_http_request(response_last_url,       #Previous response
+                                                      '%slogin' % target_site, #First POST request
+                                                      False,                 #POST request, not GET
+                                                      form_post_params, #Dict. of POST logindata
+                                                      header)           #Referer header entry
         if get_fxalarm_session().cookies.get('UserID', None) == None:
             raise RuntimeError(
                 'The login operation failed in the function ' +
@@ -238,11 +218,11 @@ def request_memberarea_navigation(response_last_url):
     try:
         target_site = get_target_website()
         header = {'Referer':'%slogin' % target_site}
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%smember-area.php' % target_site,
-                                                    True,
-                                                    None,
-                                                    header)
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      '%smember-area.php' % target_site,
+                                                      True,
+                                                      None,
+                                                      header)
         return response_last_url
     except Exception as error:
         print(error)
@@ -261,11 +241,11 @@ def request_heatmap_navigation(response_last_url):
     try:
         target_site = get_target_website()
         header = {'Referer':'%smember-area.php' % target_site}
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%sheatmap.php' % target_site,
-                                                    True,
-                                                    None,
-                                                    header)
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      '%sheatmap.php' % target_site,
+                                                      True,
+                                                      None,
+                                                      header)
         return response_last_url
     except Exception as error:
         print(error)
@@ -285,11 +265,11 @@ def request_mainsource_link(response_last_url):
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%sget_v4.php' % target_site,
-                                                    True,
-                                                    None,
-                                                    header)
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      '%sget_v4.php' % target_site,
+                                                      True,
+                                                      None,
+                                                      header)
         return response_last_url
     except Exception as error:
         print(error)
@@ -307,20 +287,45 @@ def request_mainsource_data(response_last_url):
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_link()
     :returns: response_last_url that this attempted requests.session.post() received
+
+    get_fxalarm_session().cookies.items()	[('PHPSESSID', 'f4fd1928fec94a6132c05cb424d36fcd'), ('UserID', '9951')]	list
+
+    get_v4.php RESPONSE:
+    <html>
+    <head>
+	    <title></title>
+    </head>
+    <body style="text-align:center">
+	    <form id="acForm" action="http://www.theforexheatmap.com/new-heat-map/index.php?qc=22" method="POST">
+	    <input type="hidden" name="ak" value="da4a1cbd686f0f51ed7d2528eef26db9" />
+	    </form>
+	    <iframe name="v4Heatmap" id="v4Heatmap" src="" width="820" height="1120" border="0" style="border:none"></iframe>
+	    <script id="xs" type="text/javascript">
+	    var _x = function(){
+		    var form = document.getElementById("acForm");
+		    form.target = "v4Heatmap";
+		    form.submit();
+		    form.parentNode.removeChild(form);
+		    var script = document.getElementById("xs");
+		    script.parentNode.removeChild(script);}();
+	    </script>
+    </body>
+    </html>
     """
     try:
         time.sleep(15) # Wait here 15 seconds before proceeding.
         target_site = get_target_website()
         header = {'Referer':'%sget_v4.php' % target_site}
-        form_post_data = {'ak':uuid.uuid4().hex}
+        #form_post_data = {'ak':uuid.uuid4().hex}
         response_last_url.encoding = 'utf-8'
         soup_html_parser = BeautifulSoup(response_last_url.text, 'html.parser')
         primary_source_url = soup_html_parser.find(attrs={'id' : 'acForm'}).attrs['action']
-        response_last_url = check_next_http_request(response_last_url, # Second POST request -> TODO: ERROR: a bytes-like object is required, not 'str'
-                                                    primary_source_url,
-                                                    False,
-                                                    form_post_data,
-                                                    header)
+        #TODO: ERROR: DUPLICATE PHPSESSID created! -> 'Error: You are logged out of the Forexearlywarning website, you must login again.'
+        response_last_url = execute_next_http_request(response_last_url, # Second POST request
+                                                      primary_source_url,
+                                                      False,
+                                                      None,#form_post_data,
+                                                      header)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
         return response_last_url
@@ -344,11 +349,11 @@ def request_backupsource_link(response_last_url):
         target_site = get_target_website()
         form_post_params = {'chk' : 2}
         header = {'Referer':'%sheatmap.php' % target_site}
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%sget.php' % target_site,
-                                                    True,
-                                                    form_post_params,
-                                                    header)
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      '%sget.php' % target_site,
+                                                      True,
+                                                      form_post_params,
+                                                      header)
         return response_last_url
     except Exception as error:
         print(error)
@@ -374,11 +379,11 @@ def request_backupsource_data(response_last_url):
                                      unescaped_string).group(1)
         referer = re.match('(.+)(heatmap.php.+)', backup_source_url).group(1)
         header = {'Referer':referer}
-        response_last_url = check_next_http_request(response_last_url,
-                                                    backup_source_url,
-                                                    True,
-                                                    None,
-                                                    header)
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      backup_source_url,
+                                                      True,
+                                                      None,
+                                                      header)
         response_last_url.encoding = 'utf-8'
         #Backup data!  -> backup data source .save()
         save_parsed_fxdata_to_usdtable(response_last_url.text)
@@ -402,34 +407,28 @@ def close_fxalarm_session(response_last_url):
         fxalarm_session = get_fxalarm_session().cookies.set(
             'UserID', 'deleted',
             domain=target_site.lstrip('http://').rstrip('/'), path='/') #Kill the session now!
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%slogout.php' % target_site,
-                                                    True,
-                                                    None,
-                                                    header)
-        response_last_url = check_next_http_request(response_last_url,
-                                                    '%slogin.php' % target_site,
-                                                    True,
-                                                    {'err' : 2},
-                                                    header)
-
+        response_last_url = execute_close_requests(response_last_url, target_site)
         if 'UserID' in get_fxalarm_session().cookies.items():
             raise RuntimeError('The logout operation failed in the function ' +
                                'close_fxalarm_session(). Cookie name=UserID was present - ' +
                                'please wait 90min to login again, and contact support.')
     except Exception as error:
         print(error)
-        response_last_url = check_next_http_request(response_last_url,
-                                            '%slogout.php' % target_site,
-                                            True,
-                                            None,
-                                            header)
-        response_last_url = check_next_http_request(response_last_url,
-                                            '%slogin.php' % target_site,
-                                            True,
-                                            {'err' : 2},
-                                            header)
+        response_last_url = execute_close_requests(response_last_url, target_site)
         raise
+
+def execute_close_requests(response_last_url, target_site):
+    """
+    This function executes the two close requests for close_fxalarm_session(response_last_url)
+    :param 1: response_last_url as the requests.session.response instance of the last http request
+    :param 2: target_site as the current target of these http close requests
+    """
+    header = {'Referer':'%sheatmap.php' % target_site}
+    response_last_url = execute_next_http_request(
+        response_last_url, '%slogout.php' % target_site, True, None, header)
+    response_last_url = execute_next_http_request(
+        response_last_url, '%slogin.php' % target_site, True, {'err' : 2}, header)
+    return response_last_url
 
 def save_parsed_fxdata_to_usdtable(inputfile):
     """

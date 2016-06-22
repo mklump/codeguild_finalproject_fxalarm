@@ -77,14 +77,14 @@ def render_dynamic_eventlogviewer(request):
     """
     main_execution = None
     backup_execution = None
-    last_response = None
+    last_response = parse_fxalarm.check_http_response(parse_fxalarm.get_target_website())
     if not get_stop_execution():
         username_as_email = models.MyCredentials.objects.all().values(
             'username_as_email')[0]['username_as_email']
         password = models.MyCredentials.objects.all().values('password')[0]['password']
         parse_fxalarm.erase_saved_cookielogfile()
         last_response = parse_fxalarm.open_fxalarm_session(
-            username_as_email, password
+            username_as_email, password, last_response
             )
         last_response = parse_fxalarm.request_memberarea_navigation(last_response)
         get_the_link_response = parse_fxalarm.request_heatmap_navigation(last_response)

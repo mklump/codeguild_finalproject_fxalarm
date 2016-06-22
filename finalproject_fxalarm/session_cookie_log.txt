@@ -1,2 +1,5 @@
-This cookie log file was last cleared on: 2016-06-22 00:41:41 Pacific Daylight Time
-A cookie was set by the URL: http://www.forexearlywarning.com/member-area.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-06-22 02:11:55 Pacific Daylight Time.
+This cookie log file was last cleared on: 2016-06-22 15:48:46 Pacific Daylight Time
+A cookie was set by the URL: http://www.forexearlywarning.com/member-area.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-06-22 17:18:47 Pacific Daylight Time.
+A cookie was set by the URL: http://www.forexearlywarning.com/member-area.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-06-22 17:19:12 Pacific Daylight Time.
+A cookie was set by the URL: http://www.forexearlywarning.com/heatmap.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-06-22 17:19:15 Pacific Daylight Time.
+A cookie was set by the URL: http://www.forexearlywarning.com/get_v4.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-06-22 17:19:17 Pacific Daylight Time.
