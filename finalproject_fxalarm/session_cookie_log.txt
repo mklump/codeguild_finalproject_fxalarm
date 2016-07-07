@@ -1,7 +1,0 @@
-This cookie log file was last cleared on: 2016-07-06 20:36:56 Pacific Daylight Time
-A cookie was set by the URL: http://www.forexearlywarning.com/member-area.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-07-06 22:06:57 Pacific Daylight Time.
-A cookie was set by the URL: http://www.forexearlywarning.com/member-area.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-07-06 22:06:57 Pacific Daylight Time.
-A cookie was set by the URL: http://www.forexearlywarning.com/heatmap.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-07-06 22:06:57 Pacific Daylight Time.
-A cookie was set by the URL: http://www.forexearlywarning.com/get_v4.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-07-06 22:06:58 Pacific Daylight Time.
-A cookie was set by the URL: http://www.forexearlywarning.com/get.php was found in the last http response: -> Name:UserID Value:9951 Expires:2016-07-06 22:06:58 Pacific Daylight Time.
-A cookie was set by the URL: http://www.theforexheatmap.com/new-heat-map/index.php?qc=22 was found in the last http response: -> Name:PHPSESSID Value:a3bba1f50a75a81bebcff6a4e116f982 Expires:None.
