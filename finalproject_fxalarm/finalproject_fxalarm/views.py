@@ -131,6 +131,6 @@ def render_peace_be_with_you(request):
         request,
         'finalproject_fxalarm/peace_be_with_you_farwell.html',
         {
-            'title_peace_be_with_you':'Peace be wtih you, take Good Care.',
+            'title_peace_be_with_you':'Peace be with you, take Good Care.',
         }
     )

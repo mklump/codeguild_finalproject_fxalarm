@@ -41,7 +41,28 @@ def save_static_usd_data():
                            'next run.')
     static_files = [
         find_filename_startlookingpath(
-            'primary_data_index_QC-22.html',
+            'primary_data_index_QC-22-1.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-2.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-3.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-4.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-5.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-6.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-7.html',
+            'finalproject_fxalarm'),
+        find_filename_startlookingpath(
+            'primary_data_index_QC-22-8.html',
             'finalproject_fxalarm'),
         find_filename_startlookingpath(
             'backup_data_heatmap_GROUP-AD.html',

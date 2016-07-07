@@ -6,20 +6,19 @@ by Matthew James K on 5/25/2016
 import re
 import urllib
 import time
-import logging
-import uuid
 import random
+import requests
+import browser_cookie3
 from datetime import datetime
 from datetime import timedelta
 from requests.cookies import RequestsCookieJar
 from http.cookiejar import Cookie
 from dateutil.tz import tzlocal
-import browser_cookie3
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
 from . import models
 
-gfx_alarm_session = requests.Session()
+gfx_alarm_session = Session()
 """
 The gfx_alarm_session global variable represents the session request/response throughput for every
 get_alarm_session.get() or post() function call. (must be initialized in this scope)
@@ -78,7 +77,7 @@ def get_next_usd_parse(input_file):
 
 def set_fxalarm_db_login(username, pwd, website):
     """
-    This function can only be run currenlt from a python interactive console.
+    This function can only be run current from a python interactive console.
     This function accepts 3 parameters, to save to the MyCredentials database table for access by
     this program - username_as_email, password, and target_website.
     Do not remove this function! This is for future use to add this one row without the admin page.
@@ -128,8 +127,8 @@ def execute_next_http_request(response_last_url,
                               request_params=None,
                               headers=None):
     """
-    This fuction accepts a request_url, request_params, and is_get_http_request for the next http
-    request, and executes the full url all the needed request argument sesstings. If it does,
+    This function accepts a request_url, request_params, and is_get_http_request for the next http
+    request, and executes the full url all the needed request argument settings. If it does,
     then the requests.reponse object is handed back to the next request.
     :param 1: response_last_url is the Requests.Response of the last Requests.Get for use in the
         next Requests.Get() while streaming Requests.Reponse.text
@@ -155,23 +154,40 @@ def execute_next_http_request(response_last_url,
                 headers=headers          # required for all requests
                 )
         log_changed_cookies(response_last_url)
-        if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code >= 400:
-            raise RuntimeError(('The http request url: {0}, with cookies: {1}, with get request ' +
-                                'data: {2}, and with headers: {3} has failed with status code: ' +
-                                '{4}, and taking {5} seconds amount of time to see a ' +
-                                'response.').format(request_url, get_fxalarm_session().cookies,
-                                                  request_params, headers,
-                                                  response_last_url.status_code,
-                                                  response_last_url.elapsed.total_seconds()))
-        return response_last_url
+        return check_response_last_url(response_last_url, headers, request_params)
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
         raise
 
+def check_response_last_url(response_last_url, request_headers=None, request_params=None):
+    """
+    This function accepts the response_last_url as the requests.Response object instance of the
+    last http GET or POST request, and tests the responsiveness and status code of that request.
+    NOTE: Do not call this function outside of try/except code block.
+    :param 1: response_last_url as the requests.Response instance being tested
+    :param 2: headers dictionary included with this request to be tested
+    :param 3: request_params dictionary included with this request to be tested
+    :returns: the requests.response object of the requests.Session.Get()/.Post() if all went well
+    """
+    log_changed_cookies(response_last_url)
+    if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code >= 400:
+        log_line = ('\nThe http request url: {0}, with cookies: {1}, with get request ' +
+                                'data: {2}, and with headers: {3} has failed with status code: ' +
+                                '{4}, and taking {5} seconds amount of time to see a ' +
+                                'response.').format(response_last_url.url, response_last_url.cookies,
+                                                  request_params, request_headers,
+                                                  response_last_url.status_code,
+                                                  response_last_url.elapsed.total_seconds())
+        with open('session_cookie_log.txt', mode='+a') as cookie_log:
+            cookie_log.writelines([log_line]) #append a single line on this cookie change
+        #end with open('session_cookie_log.txt') block close cookie_log obj for next one
+        raise RuntimeError(log_line)
+    return response_last_url
+
 def open_fxalarm_session(username_as_email, password, response_last_url):
     """
-    This function reads the MyCredentials table for the existance of 1 row, and starts a new
+    This function reads the MyCredentials table for the existence of 1 row, and starts a new
         active session.
     :param 1: username_as_email as the secure credentials email as username from the database with
         the request
@@ -192,7 +208,7 @@ def open_fxalarm_session(username_as_email, password, response_last_url):
         response_last_url = execute_next_http_request(response_last_url,       #Previous response
                                                       '%slogin' % target_site, #First POST request
                                                       False,                 #POST request, not GET
-                                                      form_post_params, #Dict. of POST logindata
+                                                      form_post_params, #Dict. of POST login data
                                                       header)           #Referer header entry
         if get_fxalarm_session().cookies.get('UserID', None) == None:
             raise RuntimeError(
@@ -256,7 +272,7 @@ def request_mainsource_link(response_last_url):
     """
     This function request navigation immediately follows after request_heatmap_navigation(),
         but before request_mainsource_data(). This function is responsible for finding
-        the main data source weblink in an active data session to be passed to the html scrape
+        the main data source web link in an active data session to be passed to the html scrape
         functions that are not part of this request.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_heatmap_navigation()
@@ -276,59 +292,83 @@ def request_mainsource_link(response_last_url):
         close_fxalarm_session(response_last_url)
         raise
 
-def request_mainsource_data(response_last_url):
+def get_mainsource_components(response_last_url):
     """
-    This function request navigation immediately follows after
-    request_mainsource_link(), but before request_backupsource_link().
-    This function is responsible for executing from the request for the main data source html
-        page.
-    The response.text after the request executes should be the full html data source we are
-        looking for!
+    This function immediately follows after request_mainsource_link(), but before
+        request_mainsource_data().
+    This function is responsible for gathering the required request components for the
+        request_mainsource_data() function.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_link()
-    :returns: response_last_url that this attempted requests.session.post() received
-
-    get_fxalarm_session().cookies.items()	[('PHPSESSID', 'f4fd1928fec94a6132c05cb424d36fcd'), ('UserID', '9951')]	list
-
-    get_v4.php RESPONSE:
-    <html>
-    <head>
-	    <title></title>
-    </head>
-    <body style="text-align:center">
-	    <form id="acForm" action="http://www.theforexheatmap.com/new-heat-map/index.php?qc=22" method="POST">
-	    <input type="hidden" name="ak" value="da4a1cbd686f0f51ed7d2528eef26db9" />
-	    </form>
-	    <iframe name="v4Heatmap" id="v4Heatmap" src="" width="820" height="1120" border="0" style="border:none"></iframe>
-	    <script id="xs" type="text/javascript">
-	    var _x = function(){
-		    var form = document.getElementById("acForm");
-		    form.target = "v4Heatmap";
-		    form.submit();
-		    form.parentNode.removeChild(form);
-		    var script = document.getElementById("xs");
-		    script.parentNode.removeChild(script);}();
-	    </script>
-    </body>
-    </html>
+    :returns: a list of strings for the response_last_url, primary_source_url, request_header, and
+        the request_postdata to be used by the next calling function in views.py
     """
     try:
-        time.sleep(15) # Wait here 15 seconds before proceeding.
         target_site = get_target_website()
-        header = {'Referer':'%sget_v4.php' % target_site}
-        #form_post_data = {'ak':uuid.uuid4().hex}
+        request_header = {'Referer':'%sget_v4.php' % target_site, 'Origin':target_site}
         response_last_url.encoding = 'utf-8'
-        soup_html_parser = BeautifulSoup(response_last_url.text, 'html.parser')
-        primary_source_url = soup_html_parser.find(attrs={'id' : 'acForm'}).attrs['action']
-        #TODO: ERROR: DUPLICATE PHPSESSID created! -> 'Error: You are logged out of the Forexearlywarning website, you must login again.'
-        response_last_url = execute_next_http_request(response_last_url, # Second POST request
-                                                      primary_source_url,
-                                                      False,
-                                                      None,#form_post_data,
-                                                      header)
+        html = BeautifulSoup(response_last_url.text, 'html.parser')
+        primary_source_url = html.find(attrs={'id':'acForm'}).attrs['action']
+        log_changed_urlsite(primary_source_url)
+        mainmap_key = html.find(name='input', attrs={'type':'hidden', 'name':'ak'}).attrs['value']
+        request_postdata = {'ak':mainmap_key}
+        return [response_last_url, primary_source_url, request_header, request_postdata]
+    except Exception as error:
+        print(error)
+        close_fxalarm_session(response_last_url)
+        raise
+
+def request_mainsource_data(main_response: list):
+    """
+    This function immediately follows after get_mainsource_components(), but before
+        request_backupsource_data().
+    This function is responsible for retrieving the main source data from the main source link.
+    The response.text after the request executes should be the full html data source we are
+        looking for!
+    :param 1: main_response as a list of two things: the mainsource_session sub-session for this
+        series of get requests, and also the response_last_url object instance of the last session
+        post request
+    :returns: a list of two things - mainsource_session as a session object instance that is the
+        sub-session for mainsource_link, and also response_last_url response object of this post
+    """
+    try:
+        mainsource_session = main_response[0]
+        response_last_url = main_response[1]
+        primary_source_url = response_last_url.url
+        request_headers = {'Referer':primary_source_url}
+        time.sleep(15) # Wait here 15 seconds before proceeding.
+        response_last_url = mainsource_session.get(primary_source_url, headers=request_headers)
+        check_response_last_url(primary_source_url, request_headers)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
-        return response_last_url
+        return main_response
+    except Exception as error:
+        print(error)
+        close_fxalarm_session(response_last_url)
+        raise
+
+def create_mainsource_session(response_last_url, mainsource_link, request_header, request_postdata):
+    """
+    The URL redirect that is parsed from the response of the mainsource_link for where to go
+    appears to require a second sub-session as an http web session in addition to the main login
+    session from the target website. This is accomplished by creating and returning a new
+    sub-session with the current main session still going.
+    :param 1: response_last_url is the Request.Response object instance that was passed from the
+        last call to request_mainsource_link()
+    :param 2: mainsource_link as the URL that is creating the new session for the main source to run
+    :param 3: request_header as the dictionary collection to be posted with the mainsource_link
+    :param 4: request_postdata as the dictionary collection of form post data to start new session
+    :returns: a list of two things - mainsource_session as a session object instance that is the
+        sub-session for mainsource_link, and also response_last_url response object of this post
+    """
+    try:
+        mainsource_session = Session()
+        response_last_url = mainsource_session.post(mainsource_link,
+                                                    data=request_postdata,
+                                                    headers=request_header,
+                                                    cookies=get_fxalarm_session().cookies)
+        check_response_last_url(response_last_url, request_header, request_postdata)
+        return [mainsource_session, response_last_url]
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
@@ -339,7 +379,7 @@ def request_backupsource_link(response_last_url):
     This function request navigation (Asian Session Only <group=all> not European Session
         <group=ad>) immediately follows after request_mainsource_data(), but before
         request_backupsource_data(). This function is responsible for finding
-        the backup data source weblink in an active data session to be passed to the html scrape
+        the backup data source web link in an active data session to be passed to the html scrape
         functions that are not part of this request.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_data()
@@ -377,6 +417,7 @@ def request_backupsource_data(response_last_url):
         unescaped_string = urllib.parse.unquote_plus(escaped_string)
         backup_source_url = re.match('.*\n.*iframe src="(.+)"  height=.*\n.*',
                                      unescaped_string).group(1)
+        log_changed_urlsite(backup_source_url)
         referer = re.match('(.+)(heatmap.php.+)', backup_source_url).group(1)
         header = {'Referer':referer}
         response_last_url = execute_next_http_request(response_last_url,
@@ -433,7 +474,7 @@ def execute_close_requests(response_last_url, target_site):
 def save_parsed_fxdata_to_usdtable(inputfile):
     """
     This database function accepts a specified static html instance USD source file, calls the
-    parse function, and saves the incomming USD data row at that moment as the save row occured.
+    parse function, and saves the incoming USD data row at that moment as the save row occurred.
     """
     try:
         usd_parse = get_next_usd_parse(inputfile) #returns usd_parse list of 7 float values needed.
@@ -467,20 +508,19 @@ def log_changed_cookies(previous_response=None):
         target_website2 not in all_cookies._cookies and \
         len(previous_response.cookies) == 0:
         return RequestsCookieJar()
-    else:
-        if len(previous_response.cookies) > 0:
-            for cookie in previous_response.cookies:
-                str_cookie_expires = 'None'
-                if cookie.expires != None:
-                    str_cookie_expires = datetime.fromtimestamp(
-                        cookie.expires).replace(tzinfo=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
-                log_line = ('\nA cookie was set by the URL: {0} was found in the last http ' + \
-                    'response: -> Name:{1} Value:{2} Expires:{3}.').format(
-                        previous_response.url, cookie.name, cookie.value, str_cookie_expires)
-                print(log_line)
-                with open('session_cookie_log.txt', mode='+a') as cookie_log:
-                    cookie_log.writelines([log_line]) #append a single line on this cookie change
-                #end with open('session_cookie_log.txt') block close cookie_log obj for next one
+    if len(previous_response.cookies) > 0:
+        for cookie in previous_response.cookies:
+            str_cookie_expires = 'None'
+            if cookie.expires != None:
+                str_cookie_expires = datetime.fromtimestamp(
+                    cookie.expires).replace(tzinfo=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z')
+            log_line = ('\nA cookie was set by the URL: {0} was found in the last http ' + \
+                'response: -> Name:{1} Value:{2} Expires:{3}.').format(
+                    previous_response.url, cookie.name, cookie.value, str_cookie_expires)
+            print(log_line)
+            with open('session_cookie_log.txt', mode='+a') as cookie_log:
+                cookie_log.writelines([log_line]) #append a single line on this cookie change
+            #end with open('session_cookie_log.txt') block close cookie_log obj for next one
 
 def set_cookie(key, value, minutes_expire=None):
     """
@@ -488,7 +528,7 @@ def set_cookie(key, value, minutes_expire=None):
         the specified expiration of 89 minutes as the default. Do not remove yet! -> Future Need
     :param 1: key as the cookie key as the name of this cookie
     :param 2: value as the value of which to set for this cookie
-    :param 3: minutes_expire as the number of minutes before this specificed cookie expires
+    :param 3: minutes_expire as the number of minutes before this specified cookie expires
     :returns: the created_cookie that was set
     """
     if minutes_expire is None:
@@ -517,3 +557,18 @@ def erase_saved_cookielogfile():
     with open('session_cookie_log.txt', mode='+w') as wiped:
         wiped.writelines([('This cookie log file was last cleared on: {0}').format(
             datetime.now(tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S %Z'))])
+
+def log_changed_urlsite(changed_urlsite: str):
+    """
+    This function logs any new website URLs encountered during the course of this application's
+        execution that are not the targeted website stored as part of this application's database.
+    :param 1: changed_urlsite as the parsed or found website not in the database
+    """
+    target = get_target_website()
+    if changed_urlsite != target:
+        log_line = ('\nA URL different from the target website in DB: {0} was found/parsed.'
+                    ).format(changed_urlsite)
+        print(log_line)
+        with open('session_cookie_log.txt', mode='+a') as cookie_log:
+            cookie_log.writelines([log_line]) #append a single line on this cookie change
+        #end with open('session_cookie_log.txt') block close cookie_log obj for next one
