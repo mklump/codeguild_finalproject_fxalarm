@@ -62,7 +62,6 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\content\fxalarm_site.css" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\CHFJPY_greenarrow.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\GBPCHF_redarrow.jpg" />
-    <None Include="web.debug - Copy.config" />
     <None Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\_references.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_four.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\in_GOD_we_trust_ONLY.jpg" />

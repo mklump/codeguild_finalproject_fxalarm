@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{33C46A9A-8C63-41ED-AE3D-975DA359E3F7}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,12 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design_Docs", "Design_Docs"
 		Design_Docs\FXAlarm_Timeline_Proposal.pdf = Design_Docs\FXAlarm_Timeline_Proposal.pdf
 		Design_Docs\primary_data_sample.html = Design_Docs\primary_data_sample.html
 		Design_Docs\README.md = Design_Docs\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Session Research", "Session Research", "{6978FCE3-3699-4F53-898F-F8EB5EE0CCCF}"
-	ProjectSection(SolutionItems) = preProject
-		Session Research\fewsession.saz = Session Research\fewsession.saz
-		Session Research\Raw_TextHtml_Login_Request.txt = Session Research\Raw_TextHtml_Login_Request.txt
 	EndProjectSection
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "finalproject_fxalarm", "finalproject_fxalarm\finalproject_fxalarm.pyproj", "{E76EC982-7557-4016-8E87-2312DB092F54}"
