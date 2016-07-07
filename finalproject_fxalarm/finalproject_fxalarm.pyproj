@@ -72,6 +72,14 @@
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal1.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\images\terminal2.jpg" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_intermediary.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-1.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-2.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-3.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-4.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-5.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-6.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-7.html" />
+    <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_data_index_QC-22-8.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\primary_intermediary.html" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\scripts\fxalarm_site.js" />
     <Content Include="finalproject_fxalarm\static\finalproject_fxalarm\sample_data\backup_data_heatmap_GROUP-AD.html" />

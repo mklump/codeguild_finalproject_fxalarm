@@ -9,6 +9,8 @@ import time
 import random
 import requests
 import browser_cookie3
+import selenium.webdriver.chrome.service as service
+from selenium import webdriver
 from datetime import datetime
 from datetime import timedelta
 from requests.cookies import RequestsCookieJar
