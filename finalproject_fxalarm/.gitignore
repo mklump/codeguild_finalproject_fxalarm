@@ -1,5 +1,6 @@
 venv
 db.sqlite3
 __pycache__
-chromedriver.exe
 web.debug.config
+session_cookie_log.txt
+selenium-server-standalone-2.53.1.jar

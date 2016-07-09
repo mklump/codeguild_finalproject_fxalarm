@@ -2,7 +2,7 @@
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finalproject_fxalarm/settings.py
-by Matthew James K on 5/16/2016
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 
 Django settings for finalproject_fxalarm project.
 

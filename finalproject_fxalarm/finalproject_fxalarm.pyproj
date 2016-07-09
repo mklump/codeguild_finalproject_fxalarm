@@ -37,6 +37,9 @@
     <Compile Include="finalproject_fxalarm\parse_fxalarm.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="finalproject_fxalarm\pstart_loc_server.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="finalproject_fxalarm\tests.py" />
     <Compile Include="finalproject_fxalarm\views.py" />
     <Compile Include="manage.py" />

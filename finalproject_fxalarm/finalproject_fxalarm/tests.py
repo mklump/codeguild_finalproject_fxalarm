@@ -1,4 +1,8 @@
 """
+Python Coding Bootcamp (pdxcodeguild)
+Code File for finalproject_fxalarm/admin.py
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
+
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
 """

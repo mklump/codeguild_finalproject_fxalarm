@@ -1,7 +1,7 @@
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/parse_fxalarm.py
-by Matthew James K on 5/25/2016
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 """
 import re
 import urllib
@@ -19,6 +19,7 @@ from dateutil.tz import tzlocal
 from requests import Session
 from bs4 import BeautifulSoup
 from . import models
+from . import pstart_loc_server
 
 gfx_alarm_session = Session()
 """
@@ -320,6 +321,43 @@ def get_mainsource_components(response_last_url):
         close_fxalarm_session(response_last_url)
         raise
 
+def start_selenium_js_localserver():
+    """
+    This function start a separate python script that launches the selenium remote control stand
+    alone server.
+    """
+
+def create_mainsource_session(response_last_url, mainsource_link, request_header, request_postdata):
+    """
+    The URL redirect that is parsed from the response of the mainsource_link for where to go
+    appears to require a second sub-session as an http web session in addition to the main login
+    session from the target website. This is accomplished by creating and returning a new
+    sub-session with the current main session still going.
+    :param 1: response_last_url is the Request.Response object instance that was passed from the
+        last call to request_mainsource_link()
+    :param 2: mainsource_link as the URL that is creating the new session for the main source to run
+    :param 3: request_header as the dictionary collection to be posted with the mainsource_link
+    :param 4: request_postdata as the dictionary collection of form post data to start new session
+    :returns: a list of two things - mainsource_session as a session object instance that is the
+        sub-session for mainsource_link, and also response_last_url response object of this post
+    """
+    try:
+        java_server = pstart_loc_server.pstart_loc_server()
+        if java_server == None:
+            raise RuntimeError('Staring the selenium server standalone failed to start.')
+        get_v4_url = response_last_url.url
+        #mainsource_session = Session()
+        #response_last_url = mainsource_session.post(mainsource_link,
+        #                                            data=request_postdata,
+        #                                            headers=request_header,
+        #                                            cookies=get_fxalarm_session().cookies)
+        #check_response_last_url(response_last_url, request_header, request_postdata)
+        return [mainsource_session, response_last_url]
+    except Exception as error:
+        print(error)
+        close_fxalarm_session(response_last_url)
+        raise
+
 def request_mainsource_data(main_response: list):
     """
     This function immediately follows after get_mainsource_components(), but before
@@ -344,33 +382,6 @@ def request_mainsource_data(main_response: list):
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
         return main_response
-    except Exception as error:
-        print(error)
-        close_fxalarm_session(response_last_url)
-        raise
-
-def create_mainsource_session(response_last_url, mainsource_link, request_header, request_postdata):
-    """
-    The URL redirect that is parsed from the response of the mainsource_link for where to go
-    appears to require a second sub-session as an http web session in addition to the main login
-    session from the target website. This is accomplished by creating and returning a new
-    sub-session with the current main session still going.
-    :param 1: response_last_url is the Request.Response object instance that was passed from the
-        last call to request_mainsource_link()
-    :param 2: mainsource_link as the URL that is creating the new session for the main source to run
-    :param 3: request_header as the dictionary collection to be posted with the mainsource_link
-    :param 4: request_postdata as the dictionary collection of form post data to start new session
-    :returns: a list of two things - mainsource_session as a session object instance that is the
-        sub-session for mainsource_link, and also response_last_url response object of this post
-    """
-    try:
-        mainsource_session = Session()
-        response_last_url = mainsource_session.post(mainsource_link,
-                                                    data=request_postdata,
-                                                    headers=request_header,
-                                                    cookies=get_fxalarm_session().cookies)
-        check_response_last_url(response_last_url, request_header, request_postdata)
-        return [mainsource_session, response_last_url]
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
@@ -510,7 +521,7 @@ def log_changed_cookies(previous_response=None):
         target_website2 not in all_cookies._cookies and \
         len(previous_response.cookies) == 0:
         return RequestsCookieJar()
-    if len(previous_response.cookies) > 0:
+    if previous_response is requests.Response and len(previous_response.cookies) > 0:
         for cookie in previous_response.cookies:
             str_cookie_expires = 'None'
             if cookie.expires != None:

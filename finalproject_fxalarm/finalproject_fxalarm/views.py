@@ -2,7 +2,7 @@
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finalproject_fxalarm/views.py
-by Matthew James K on 5/16/2016
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 
 Definition of views.
 """
@@ -35,6 +35,7 @@ def set_stop_execution(value):
     This setter function assigns the boolean global variable stop_execution.
     :param 1: value as boolean literal to assign to global variable stop_execution.
     """
+    global stop_execution
     stop_execution = value
 
 def render_home(request):
@@ -89,6 +90,9 @@ def render_dynamic_eventlogviewer(request):
         last_response = parse_fxalarm.request_memberarea_navigation(last_response)
         get_the_link_response = parse_fxalarm.request_heatmap_navigation(last_response)
         main_response = parse_fxalarm.request_mainsource_link(get_the_link_response)
+        main_response = parse_fxalarm.get_mainsource_components(main_response)
+        main_response = parse_fxalarm.create_mainsource_session(
+            main_response[0], main_response[1], main_response[2], main_response[3])
         backup_response = parse_fxalarm.request_backupsource_link(get_the_link_response)
 
     while not get_stop_execution():
@@ -118,7 +122,7 @@ def render_stop_gathering(request, stop_gathering):
     named stop_execution that this while loop will be checking as a stop condition.
     """
     if stop_gathering == 'True':
-        stop_execution = True
+        set_stop_execution(True)
     render_dynamic_eventlogviewer(request)
     return HttpResponse('')
 

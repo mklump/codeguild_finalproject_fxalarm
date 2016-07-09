@@ -1,7 +1,7 @@
 """
 Python Coding Bootcamp (pdxcodeguild)
 Program exercise file finalproject_fxalarm/models.py
-by Matthew James K on 5/19/2016
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 
 Definition of models.
 """

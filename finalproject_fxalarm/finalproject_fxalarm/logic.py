@@ -2,7 +2,7 @@
 """
 Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/logic.py
-by Matthew James K on 5/16/2016
+by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 """
 import os
 from . import models
