@@ -321,12 +321,6 @@ def get_mainsource_components(response_last_url):
         close_fxalarm_session(response_last_url)
         raise
 
-def start_selenium_js_localserver():
-    """
-    This function start a separate python script that launches the selenium remote control stand
-    alone server.
-    """
-
 def create_mainsource_session(response_last_url, mainsource_link, request_header, request_postdata):
     """
     The URL redirect that is parsed from the response of the mainsource_link for where to go
@@ -345,6 +339,10 @@ def create_mainsource_session(response_last_url, mainsource_link, request_header
         java_server = pstart_loc_server.pstart_loc_server()
         if java_server == None:
             raise RuntimeError('Staring the selenium server standalone failed to start.')
+        else:
+            driver = webdriver.Remote("http://localhost:4444/wd/hub",
+                                      webdriver.DesiredCapabilities.HTMLUNITWITHJS)
+        
         get_v4_url = response_last_url.url
         #mainsource_session = Session()
         #response_last_url = mainsource_session.post(mainsource_link,

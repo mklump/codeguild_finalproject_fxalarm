@@ -6,7 +6,7 @@
     <ProjectGuid>3d90367e-5301-4eee-ba64-dd36b2163afa</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>PythonUSDTestApp.py</StartupFile>
+    <StartupFile>test-selenium-requests.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,6 +24,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="PythonUSDTestApp.py" />
+    <Compile Include="test-selenium-requests.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="backup_data_heatmap_GROUP-AD.html" />
