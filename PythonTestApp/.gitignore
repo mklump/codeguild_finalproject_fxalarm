@@ -1,7 +1,2 @@
-venv
-db.sqlite3
-__pycache__
-web.debug.config
-session_cookie_log.txt
 htmlunit-driver-standalone-2.21.jar
 selenium-server-standalone-2.53.1.jar

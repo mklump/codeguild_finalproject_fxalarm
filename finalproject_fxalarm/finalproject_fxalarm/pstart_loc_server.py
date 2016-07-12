@@ -4,7 +4,6 @@ FXAlarm Final Project file finsalproject_fxalarm/pstart_loc_server.py
 by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 """
 import threading
-from time import sleep
 from subprocess import Popen, PIPE, STDOUT
 
 JAVA_PROCESS = None
