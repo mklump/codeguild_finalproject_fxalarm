@@ -339,21 +339,30 @@ def create_mainsource_session(response_last_url, mainsource_link, request_header
         java_server = pstart_loc_server.pstart_loc_server()
         if java_server == None:
             raise RuntimeError('Staring the selenium server standalone failed to start.')
-        else:
-            driver = webdriver.Remote("http://localhost:4444/wd/hub",
-                                      webdriver.DesiredCapabilities.HTMLUNITWITHJS)
-        
+        else: #htmlunitjs_driver IS NOW mainsource_session
+            htmlunitjs_driver = pstart_loc_server.HtmlUnitJS(
+                command_executor='http://localhost:4444/wd/hub',
+                keep_alive=True,
+                desired_capabilities={'browserName': 'htmlunit',
+                                      'javascriptEnabled': True,
+                                      'platform': 'ANY',
+                                      'version': 'firefox'})
         get_v4_url = response_last_url.url
-        #mainsource_session = Session()
-        #response_last_url = mainsource_session.post(mainsource_link,
-        #                                            data=request_postdata,
-        #                                            headers=request_header,
-        #                                            cookies=get_fxalarm_session().cookies)
+        htmlunitjs_driver.get(get_v4_url)
+        response_last_url = htmlunitjs_driver.request('POST', url=mainsource_link,
+                                                      find_window_handle_timeout=2,
+                                                      page_load_timeout=2,
+                                                      data=request_postdata,
+                                                      headers=request_header,
+                                                      cookies= \
+                                                      get_fxalarm_session().cookies.get_dict())
         #check_response_last_url(response_last_url, request_header, request_postdata)
-        return [mainsource_session, response_last_url]
+        return [htmlunitjs_driver, response_last_url]
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
+        htmlunitjs_driver.quit()
+        java_server.terminate() #stop the running server process container thread!
         raise
 
 def request_mainsource_data(main_response: list):

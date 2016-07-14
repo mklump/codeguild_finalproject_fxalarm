@@ -22,7 +22,7 @@ class HtmlUnitJS(Remote, RequestMixin):
 
 def run_java_loc_server():
     """
-    This function delegate for the main threadstart is responsible for launching the java based
+    This function delegate for the main thread start is responsible for launching the java based
     selenium-server-standalone for executing our required http get and post http requests to the
     javascript protected content on the target web site for parsing.
     """
@@ -44,7 +44,7 @@ def pstart_loc_server():
     This function is responsible for creating the separate threading.Thread in which our selenium
     server standalone will execute.
     :returns: the Popen local object instance of JAVA_PROCESS as Popen object instance to kill when
-    an error has occured
+    an error has occurred
     """
     thread = threading.Thread(target=run_java_loc_server)
     thread.start()
@@ -70,7 +70,7 @@ def main():
 
         htmlunit_driver = Remote("http://localhost:4444/wd/hub",
                                  DesiredCapabilities.HTMLUNITWITHJS)
-        
+
         htmlunit_driver = webdriver.Remote("http://localhost:4444/wd/hub",
                                            DesiredCapabilities.HTMLUNITWITHJS)
     except Exception as error:

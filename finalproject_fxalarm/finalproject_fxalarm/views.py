@@ -42,7 +42,7 @@ def render_home(request):
     """
     This view function renders the home page route to fxalarm_usd_index.html.
     """
-    #assert isinstance(request, HttpRequest) For future rememberance should django ever change.
+    #assert isinstance(request, HttpRequest) For future remembrance should django ever change.
     return render(
         request,
         'finalproject_fxalarm/fxalarm_usd_index.html',
@@ -98,7 +98,7 @@ def render_dynamic_eventlogviewer(request):
     while not get_stop_execution():
         last_response = parse_fxalarm.request_mainsource_data(main_response)
         last_response = parse_fxalarm.request_backupsource_data(backup_response)
-    # endof while not get_stop_execution():
+    # end of while not get_stop_execution():
 
     parse_fxalarm.close_fxalarm_session(last_response)
     set_stop_execution(False)
