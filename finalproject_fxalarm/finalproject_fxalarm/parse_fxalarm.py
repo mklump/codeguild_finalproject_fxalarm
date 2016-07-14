@@ -9,8 +9,6 @@ import time
 import random
 import requests
 import browser_cookie3
-import selenium.webdriver.chrome.service as service
-from selenium import webdriver
 from datetime import datetime
 from datetime import timedelta
 from requests.cookies import RequestsCookieJar
@@ -171,7 +169,7 @@ def check_response_last_url(response_last_url, request_headers=None, request_par
     :param 1: response_last_url as the requests.Response instance being tested
     :param 2: headers dictionary included with this request to be tested
     :param 3: request_params dictionary included with this request to be tested
-    :returns: the requests.response object of the requests.Session.Get()/.Post() if all went well
+    :returns: the requests.Response object of the requests.Session.Get()/.Post() if all went well
     """
     log_changed_cookies(response_last_url)
     if response_last_url.elapsed.total_seconds() > 5 or response_last_url.status_code >= 400:
@@ -349,14 +347,15 @@ def create_mainsource_session(response_last_url, mainsource_link, request_header
                                       'version': 'firefox'})
         get_v4_url = response_last_url.url
         htmlunitjs_driver.get(get_v4_url)
-        response_last_url = htmlunitjs_driver.request('POST', url=mainsource_link,
+        response_last_url = htmlunitjs_driver.request(method='get', url=get_v4_url,
                                                       find_window_handle_timeout=2,
                                                       page_load_timeout=2,
                                                       data=request_postdata,
                                                       headers=request_header,
                                                       cookies= \
                                                       get_fxalarm_session().cookies.get_dict())
-        #check_response_last_url(response_last_url, request_header, request_postdata)
+        htmlunitjs_driver.refresh()
+        check_response_last_url(response_last_url, request_header, request_postdata)
         return [htmlunitjs_driver, response_last_url]
     except Exception as error:
         print(error)
@@ -372,26 +371,30 @@ def request_mainsource_data(main_response: list):
     This function is responsible for retrieving the main source data from the main source link.
     The response.text after the request executes should be the full html data source we are
         looking for!
-    :param 1: main_response as a list of two things: the mainsource_session sub-session for this
+    :param 1: main_response as a list of two things: the htmlunitjs_driver sub-session for this
         series of get requests, and also the response_last_url object instance of the last session
         post request
-    :returns: a list of two things - mainsource_session as a session object instance that is the
-        sub-session for mainsource_link, and also response_last_url response object of this post
+    :returns: a list of two things - htmlunitjs_driver as a seleniumrequests.Remote htmlunit
+        webdriver object instance that is the sub-session for mainsource_link, and also
+        response_last_url response object of this post
     """
     try:
-        mainsource_session = main_response[0]
+        htmlunitjs_driver = main_response[0]
         response_last_url = main_response[1]
         primary_source_url = response_last_url.url
         request_headers = {'Referer':primary_source_url}
-        time.sleep(15) # Wait here 15 seconds before proceeding.
-        response_last_url = mainsource_session.get(primary_source_url, headers=request_headers)
-        check_response_last_url(primary_source_url, request_headers)
+        time.sleep(10) # Wait here 10 seconds before proceeding.
+        response_last_url = htmlunitjs_driver.request(
+            method='get', url=primary_source_url, find_window_handle_timeout=2,
+            page_load_timeout=2, headers=request_headers)
+        check_response_last_url(response_last_url, request_headers)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
         return main_response
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
+        htmlunitjs_driver.quit()
         raise
 
 def request_backupsource_link(response_last_url):
@@ -528,7 +531,7 @@ def log_changed_cookies(previous_response=None):
         target_website2 not in all_cookies._cookies and \
         len(previous_response.cookies) == 0:
         return RequestsCookieJar()
-    if previous_response is requests.Response and len(previous_response.cookies) > 0:
+    if len(previous_response.cookies) > 0:
         for cookie in previous_response.cookies:
             str_cookie_expires = 'None'
             if cookie.expires != None:
