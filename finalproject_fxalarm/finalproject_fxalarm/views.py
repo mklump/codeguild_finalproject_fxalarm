@@ -78,6 +78,7 @@ def render_dynamic_eventlogviewer(request):
     """
     main_execution = None
     backup_execution = None
+    parse_fxalarm.startup_htmlunitjs_webdriver()
     last_response = parse_fxalarm.check_http_response(parse_fxalarm.get_target_website())
     if not get_stop_execution():
         username_as_email = models.MyCredentials.objects.all().values(

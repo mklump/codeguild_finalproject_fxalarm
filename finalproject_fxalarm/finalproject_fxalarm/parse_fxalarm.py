@@ -7,29 +7,36 @@ import re
 import urllib
 import time
 import random
-import requests
-import browser_cookie3
 from datetime import datetime
 from datetime import timedelta
-from requests.cookies import RequestsCookieJar
-from http.cookiejar import Cookie
 from dateutil.tz import tzlocal
-from requests import Session
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from . import models
 from . import pstart_loc_server
 
-gfx_alarm_session = Session()
+java_server = None
 """
-The gfx_alarm_session global variable represents the session request/response throughput for every
-get_alarm_session.get() or post() function call. (must be initialized in this scope)
+The java_server global variable represents the instance of selenium remote htmlunit web driver.
 """
 
-def get_fxalarm_session():
+def get_java_server():
     """
-    This is the get function for the global variable gfx_alarm_session.
+    This is the get function for the global variable java_server.
     """
-    return gfx_alarm_session
+    return java_server
+
+htmlunitjs_driver = None
+"""
+This htmlunitjs_driver global variable represents client connection instance to the selenium
+remote htmlunit web driver.
+"""
+
+def get_htmlunitjs_driver():
+    """
+    This is the get function for the globale variable htmlunitjs_driver.
+    """
+    return htmlunitjs_driver
 
 def parse_html_source_file(input_file):
     """
@@ -42,13 +49,17 @@ def parse_html_source_file(input_file):
     """
     soup_html_xml_parser = None
     try:
-        with open(input_file, mode='rt') as html:
-            soup_html_xml_parser = BeautifulSoup(html, 'html.parser')
-        # end with block/close file
+        if len(input_file) <= 260:
+            with open(input_file, mode='rt') as html:
+                soup_html_xml_parser = BeautifulSoup(html, 'html.parser')
+            # end with block/close file
+        else:
+            soup_html_xml_parser = BeautifulSoup(input_file, 'html.parser')
+        return soup_html_xml_parser
     except Exception as error:
         print(error)
+        close_fxalarm_session()
         raise
-    return soup_html_xml_parser
 
 def parse_currency_node(html_parser, currency_symbol):
     """
@@ -103,6 +114,25 @@ def get_target_website():
     """
     return models.MyCredentials.objects.all().values('target_website')[0]['target_website']
 
+def startup_htmlunitjs_webdriver():
+    """
+    This function starts up the selenium-requests remote webdriver, and simultaneously connects
+    the htmlunit parser client web broswer.
+    """
+    global java_server
+    global htmlunitjs_driver
+    java_server = pstart_loc_server.pstart_loc_server()
+    if java_server == None:
+        raise RuntimeError('Staring the selenium server standalone failed to start.')
+    else: #htmlunitjs_driver IS NOW mainsource_session
+        htmlunitjs_driver = pstart_loc_server.HtmlUnitJS(
+            command_executor='http://localhost:4444/wd/hub',
+            keep_alive=True,
+            desired_capabilities={'browserName': 'htmlunit',
+                                  'javascriptEnabled': True,
+                                  'platform': 'ANY',
+                                  'version': 2})
+
 def check_http_response(target_request_url):
     """
     This function accepts a target_request_url and checks if the url is 'executable', and has
@@ -111,7 +141,7 @@ def check_http_response(target_request_url):
     :returns: the returned requests.session.response object if all went well
     """
     try:
-        response_last_url = get_fxalarm_session().get(target_request_url)
+        response_last_url = get_htmlunitjs_driver().get(target_request_url)
         if response_last_url != None and response_last_url.status_code >= 400:
             raise RuntimeError(
                 ('The request_url {0} returned status: {1}').format(
@@ -143,14 +173,14 @@ def execute_next_http_request(response_last_url,
     """
     try:
         if is_get_http_request:
-            response_last_url = get_fxalarm_session().get(
-                request_url,             # required for all requests
+            response_last_url = get_htmlunitjs_driver().request(method='get',
+                url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
                 headers=headers          # required for all requests
                 )
         else:
-            response_last_url = get_fxalarm_session().post(
-                request_url,             # required for all requests
+            response_last_url = get_htmlunitjs_driver().request(method='post',
+                url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
                 headers=headers          # required for all requests
                 )
@@ -211,7 +241,7 @@ def open_fxalarm_session(username_as_email, password, response_last_url):
                                                       False,                 #POST request, not GET
                                                       form_post_params, #Dict. of POST login data
                                                       header)           #Referer header entry
-        if get_fxalarm_session().cookies.get('UserID', None) == None:
+        if get_htmlunitjs_driver().get_cookie('UserID') == None:
             raise RuntimeError(
                 'The login operation failed in the function ' +
                 'open_fxalarm_session(), or a login attempt at the target ' +
@@ -330,71 +360,47 @@ def create_mainsource_session(response_last_url, mainsource_link, request_header
     :param 2: mainsource_link as the URL that is creating the new session for the main source to run
     :param 3: request_header as the dictionary collection to be posted with the mainsource_link
     :param 4: request_postdata as the dictionary collection of form post data to start new session
-    :returns: a list of two things - mainsource_session as a session object instance that is the
-        sub-session for mainsource_link, and also response_last_url response object of this post
+    :returns: response_last_url request.Response object instance of this post request
     """
     try:
-        java_server = pstart_loc_server.pstart_loc_server()
-        if java_server == None:
-            raise RuntimeError('Staring the selenium server standalone failed to start.')
-        else: #htmlunitjs_driver IS NOW mainsource_session
-            htmlunitjs_driver = pstart_loc_server.HtmlUnitJS(
-                command_executor='http://localhost:4444/wd/hub',
-                keep_alive=True,
-                desired_capabilities={'browserName': 'htmlunit',
-                                      'javascriptEnabled': True,
-                                      'platform': 'ANY',
-                                      'version': 'firefox'})
-        get_v4_url = response_last_url.url
-        htmlunitjs_driver.get(get_v4_url)
-        response_last_url = htmlunitjs_driver.request(method='get', url=get_v4_url,
+        response_last_url = htmlunitjs_driver.request(method='post', url=mainsource_link,
                                                       find_window_handle_timeout=2,
                                                       page_load_timeout=2,
                                                       data=request_postdata,
-                                                      headers=request_header,
-                                                      cookies= \
-                                                      get_fxalarm_session().cookies.get_dict())
-        htmlunitjs_driver.refresh()
+                                                      headers=request_header)
         check_response_last_url(response_last_url, request_header, request_postdata)
-        return [htmlunitjs_driver, response_last_url]
+        return response_last_url
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
-        htmlunitjs_driver.quit()
-        java_server.terminate() #stop the running server process container thread!
         raise
 
-def request_mainsource_data(main_response: list):
+def request_mainsource_data(response_last_url):
     """
     This function immediately follows after get_mainsource_components(), but before
         request_backupsource_data().
     This function is responsible for retrieving the main source data from the main source link.
     The response.text after the request executes should be the full html data source we are
         looking for!
-    :param 1: main_response as a list of two things: the htmlunitjs_driver sub-session for this
-        series of get requests, and also the response_last_url object instance of the last session
-        post request
+    :param 1: response_last_url requests.Response object instance of the last http post request
     :returns: a list of two things - htmlunitjs_driver as a seleniumrequests.Remote htmlunit
         webdriver object instance that is the sub-session for mainsource_link, and also
         response_last_url response object of this post
     """
     try:
-        htmlunitjs_driver = main_response[0]
-        response_last_url = main_response[1]
         primary_source_url = response_last_url.url
         request_headers = {'Referer':primary_source_url}
-        time.sleep(10) # Wait here 10 seconds before proceeding.
+        time.sleep(3) # Wait here 3 seconds before proceeding.
         response_last_url = htmlunitjs_driver.request(
             method='get', url=primary_source_url, find_window_handle_timeout=2,
             page_load_timeout=2, headers=request_headers)
         check_response_last_url(response_last_url, request_headers)
         response_last_url.encoding = 'utf-8'
         save_parsed_fxdata_to_usdtable(response_last_url.text) # Data! -> primary data .save()
-        return main_response
+        return response_last_url
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
-        htmlunitjs_driver.quit()
         raise
 
 def request_backupsource_link(response_last_url):
@@ -413,7 +419,7 @@ def request_backupsource_link(response_last_url):
         form_post_params = {'chk' : 2}
         header = {'Referer':'%sheatmap.php' % target_site}
         response_last_url = execute_next_http_request(response_last_url,
-                                                      '%sget.php' % target_site,
+                                                      '%sget.php?chk=2' % target_site,
                                                       True,
                                                       form_post_params,
                                                       header)
@@ -436,13 +442,12 @@ def request_backupsource_data(response_last_url):
     """
     try:
         response_last_url.encoding = 'utf-8'
-        escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', response_last_url.text)
+        escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', response_last_url.text).group(1)
         unescaped_string = urllib.parse.unquote_plus(escaped_string)
         backup_source_url = re.match('.*\n.*iframe src="(.+)"  height=.*\n.*',
                                      unescaped_string).group(1)
         log_changed_urlsite(backup_source_url)
-        referer = re.match('(.+)(heatmap.php.+)', backup_source_url).group(1)
-        header = {'Referer':referer}
+        header = {'Referer':backup_source_url}
         response_last_url = execute_next_http_request(response_last_url,
                                                       backup_source_url,
                                                       True,
@@ -457,7 +462,7 @@ def request_backupsource_data(response_last_url):
         close_fxalarm_session(response_last_url)
         raise
 
-def close_fxalarm_session(response_last_url):
+def close_fxalarm_session(response_last_url = None):
     """
     This function checks if a current fxalarm session is active and closes it by executing 3 http
         requests.get() calls to properly logout.
@@ -468,18 +473,19 @@ def close_fxalarm_session(response_last_url):
     try:
         target_site = get_target_website()
         header = {'Referer':'%sheatmap.php' % target_site}
-        fxalarm_session = get_fxalarm_session().cookies.set(
-            'UserID', 'deleted',
-            domain=target_site.lstrip('http://').rstrip('/'), path='/') #Kill the session now!
+        login_cookie = get_htmlunitjs_driver().get_cookie('UserID')
+        login_cookie['value'] = 'deleted'
+        get_htmlunitjs_driver().delete_cookie('UserID')
+        get_htmlunitjs_driver().add_cookie(login_cookie)
         response_last_url = execute_close_requests(response_last_url, target_site)
-        if 'UserID' in get_fxalarm_session().cookies.items():
+        if 'UserID' in get_htmlunitjs_driver().get_cookies():
             raise RuntimeError('The logout operation failed in the function ' +
-                               'close_fxalarm_session(). Cookie name=UserID was present - ' +
+                               'close_fxalarm_session(). Cookie name=\'UserID\' was present - ' +
                                'please wait 90min to login again, and contact support.')
+        get_htmlunitjs_driver().quit()
+        get_java_server().terminate() #stop the running server process container thread!
     except Exception as error:
         print(error)
-        response_last_url = execute_close_requests(response_last_url, target_site)
-        raise
 
 def execute_close_requests(response_last_url, target_site):
     """
@@ -513,6 +519,7 @@ def save_parsed_fxdata_to_usdtable(inputfile):
         usd_instance.save()
     except Exception as error:
         print(error)
+        close_fxalarm_session()
         raise
 
 def log_changed_cookies(previous_response=None):
@@ -523,14 +530,14 @@ def log_changed_cookies(previous_response=None):
     :param 1: previous_response represents the previous response including the response
         cookies of the last http request.
     """
-    all_cookies = browser_cookie3.load()
+    all_cookies = get_htmlunitjs_driver().get_cookies()
     target = get_target_website()
     target_website1 = target.lstrip('http://').rstrip('/')
     target_website2 = target.lstrip('http://www').rstrip('/')
-    if target_website1 not in all_cookies._cookies and \
-        target_website2 not in all_cookies._cookies and \
+    if target_website1 not in all_cookies and \
+        target_website2 not in all_cookies and \
         len(previous_response.cookies) == 0:
-        return RequestsCookieJar()
+        return None
     if len(previous_response.cookies) > 0:
         for cookie in previous_response.cookies:
             str_cookie_expires = 'None'
@@ -545,14 +552,13 @@ def log_changed_cookies(previous_response=None):
                 cookie_log.writelines([log_line]) #append a single line on this cookie change
             #end with open('session_cookie_log.txt') block close cookie_log obj for next one
 
-def set_cookie(key, value, minutes_expire=None):
+def add_cookie(key, value, minutes_expire=None):
     """
     This function sets the specified cookie using the specified key to the specified value with
         the specified expiration of 89 minutes as the default. Do not remove yet! -> Future Need
     :param 1: key as the cookie key as the name of this cookie
     :param 2: value as the value of which to set for this cookie
     :param 3: minutes_expire as the number of minutes before this specified cookie expires
-    :returns: the created_cookie that was set
     """
     if minutes_expire is None:
         max_age = 89 * 60 #89 minutes before expiration as the default if None is passed
@@ -563,15 +569,14 @@ def set_cookie(key, value, minutes_expire=None):
             "%a, %d-%b-%Y %H:%M:%S %Z"),
         "%a, %d-%b-%Y %H:%M:%S %Z"
         )
-    created_cookie = browser_cookie3.create_cookie(
-        get_target_website().lstrip('http://').rstrip('/'), #website for this cookie
-        '/', #path for this cookie
-        True, #is this cookie 'secure'?
-        expires.toordinal(), #expiration for this cookie
-        key, #key name for this cookie
-        value #value for this cookie
-        )
-    return created_cookie
+    created_cookie = get_htmlunitjs_driver().add_cookie({
+        'name':key, #key name for this cookie
+        'value':value, #value for this cookie
+        'path':'/', #path for this cookie
+        'domain':get_target_website().lstrip('http://').rstrip('/'), #website for this cookie
+        'secure':True, #is this cookie 'secure'?
+        'expiry':expires.toordinal() #expiration for this cookie
+        })
 
 def erase_saved_cookielogfile():
     """
