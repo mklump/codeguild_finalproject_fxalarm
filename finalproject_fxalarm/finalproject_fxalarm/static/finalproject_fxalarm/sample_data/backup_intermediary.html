@@ -1,7 +1,95 @@
-regular_expression --> .+unescape\("(.+)"\)\);
-document.write(unescape("%09%3Cscript%20language%3D%22JavaScript%22%3E%20%0A%09document.write%28%27%3Ciframe%20src%3D%22http%3A%2F%2F204.12.52.120%2Fhm3488746%2F%22%20%20height%3D%221300%22%20width%3D%22820%22%20frameborder%3D%220%22%20scrolling%3D%22auto%22%20%20target%3D%22_blank%22%3E%3C%2Fiframe%3E%27%29%3B%0A%09%3C%2Fscript%3E%0A"));
+﻿<!--
+regular_expression - .+unescape\("(.+)"\)\);
+document.write(unescape("%09%3Cscript%20language%3D%22JavaScript%22%3E%20%0A%09document.write%28%27%3Ciframe%20src%3D%22http%3A%2F%2F204.12.52.120%2Fhm3363559%2F%22%20%20height%3D%221300%22%20width%3D%22820%22%20frameborder%3D%220%22%20scrolling%3D%22auto%22%20%20target%3D%22_blank%22%3E%3C%2Fiframe%3E%27%29%3B%0A%09%3C%2Fscript%3E%0A"));
+%09%3Cscript%20language%3D%22JavaScript%22%3E%20%0A%09document.write%28%27%3Ciframe%20src%3D%22http%3A%2F%2F204.12.52.120%2Fhm3363559%2F%22%20%20height%3D%221300%22%20width%3D%22820%22%20frameborder%3D%220%22%20scrolling%3D%22auto%22%20%20target%3D%22_blank%22%3E%3C%2Fiframe%3E%27%29%3B%0A%09%3C%2Fscript%3E%0A
+-->
 
-regular_expession --> .*\n.*iframe src="(.+)"  height=.*\n.*
+<!--
+	regular_expession - .*\n.*iframe src="(.+)"  height=.*\n.*
+-->
+<!-- Actual unescaped string from above yeilds this javascript:
 	<script language="JavaScript"> 
-		document.write('<iframe src="http://204.12.52.120/hm3488746/"  height="1300" width="820" frameborder="0" scrolling="auto"  target="_blank"></iframe>');
+	document.write('<iframe src="http://204.12.52.120/hm3363559/"  height="1300" width="820" frameborder="0" scrolling="auto"  target="_blank"></iframe>');
 	</script>
+
+-->
+
+<!-- The document.write() in the javascript forms a GET request to the SRC of the iframe sub page control:
+<iframe src="http://204.12.52.120/hm3363559/"  height="1300" width="820" frameborder="0" scrolling="auto"  target="_blank">
+</iframe>
+-->
+
+<!-- For the two inner iframe sub-pages to load, the htmlunit remote webdriver selenium execution/harness mock headless browser
+MUST ACTUALLY SUPPORT rendering the iframe html control-->
+<!-- This is the actual sub-page rendering from the SRC="http://204.12.52.120/hm3363559/" of the iframe: -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>The FOREX Heatmap</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style type="text/css">
+<!--
+body {
+	background-color:#000000;
+	font-family:Arial,Helvetica,sans-serif;
+	margin:0px;
+	padding:0px;
+	color:#FFFFFF;
+	font-size:13px;
+}
+
+.container {
+}
+.title {
+	color: #FFFFFF;
+	font-size:20px;
+}
+.left-col {
+	width: 343px;
+	float:left;
+	margin:40px 0 0 30px;
+}
+.left-col .iframe {
+/* 	height:570px; */
+	height:1160px;
+	overflow:auto;
+}
+
+.right-col {
+	width: 343px;
+	float:left;
+	margin:40px 0 0 80px;
+}
+.right-col .iframe {
+/* 	height:570px; */
+	height:1160px;
+	overflow:auto;
+}
+
+-->
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+	<div class="left-col">
+		<span class="title">Asian Session</span>
+		<div class="iframe">
+			<iframe width="323" height="1150" scrolling="no" frameborder="0" vspace="0" style="" marginwidth="0" marginheight="0" hspace="0" name="heatmap_asian" id="heatmap_asian" src="heatmap.php?group=all"></iframe>
+		</div>
+	</div>
+
+	<div class="right-col">
+		<span class="title">European/American Session</span>
+		<div class="iframe">
+			<iframe width="323" height="1150" scrolling="no" frameborder="0" vspace="0" style="" marginwidth="0" marginheight="0" hspace="0" name="heatmap_eurous" id="heatmap_eurous" src="heatmap.php?group=ad"></iframe>
+		</div>
+	</div>
+
+</div><!-- end container -->
+
+</body>
+</html>

@@ -7,10 +7,12 @@ import re
 import urllib
 import time
 import random
+import requests
 from datetime import datetime
 from datetime import timedelta
 from dateutil.tz import tzlocal
 from bs4 import BeautifulSoup
+from selenium.webdriver import Remote as remote_webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from . import models
 from . import pstart_loc_server
@@ -176,13 +178,15 @@ def execute_next_http_request(response_last_url,
             response_last_url = get_htmlunitjs_driver().request(method='get',
                 url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
-                headers=headers          # required for all requests
+                headers=headers,          # required for all requests
+                page_load_timeout=2
                 )
         else:
             response_last_url = get_htmlunitjs_driver().request(method='post',
                 url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
-                headers=headers          # required for all requests
+                headers=headers,          # required for all requests
+                page_load_timeout=2
                 )
         log_changed_cookies(response_last_url)
         return check_response_last_url(response_last_url, headers, request_params)
@@ -412,7 +416,8 @@ def request_backupsource_link(response_last_url):
         functions that are not part of this request.
     :param 1: response_last_url is the Request.Response object instance that was passed from the
         last call to request_mainsource_data()
-    :returns: response_last_url that this attempted requests.session.get() received
+    :returns: a list of two things: the response_last_url that this attempted requests.get()
+    received, and also the backup_source_url parsed from this response string
     """
     try:
         target_site = get_target_website()
@@ -423,33 +428,74 @@ def request_backupsource_link(response_last_url):
                                                       True,
                                                       form_post_params,
                                                       header)
-        return response_last_url
+        response_last_url.encoding = 'utf-8'
+        escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', response_last_url.text)
+        if escaped_string == None:
+            raise RuntimeError('Unescape regular expression within request_backupsource_link()' + \
+                ' function call did not succeed.')
+        else:
+            escaped_string = escaped_string.group(1)
+        unescaped_string = urllib.parse.unquote(escaped_string)
+        backup_source_url = re.match('[\t\n]?.*[\t\n]?.*iframe src=\"([httphm:\/\.0-9]+)\"',
+                                     unescaped_string)
+        if backup_source_url == None:
+            raise RuntimeError('Backup source url regular expression within ' + \
+                'request_backupsource_link() function call did not succeed.')
+        else:
+            backup_source_url = backup_source_url.group(1)
+        log_changed_urlsite(backup_source_url)
+        return [response_last_url, backup_source_url]
     except Exception as error:
         print(error)
         close_fxalarm_session(response_last_url)
         raise
 
-def request_backupsource_data(response_last_url):
+def request_backupsource_asian_sess_data(back_response: list):
     """
     This function request navigation (Asian Session Only <group=all> not European Session
         <group=ad>) immediately follows after request_backupsource_link(), but before
         close_fxalarm_session().
     This function is responsible for executing from the request for the backup data source html
         page in case of the event that the main source html page were to fail to respond.
-    :param 1: response_last_url is the Request.Response object instance that was passed from the
-        last call to request_backupsource_link()
+    :param 1: back_response as a list of two things: the response_last_url that this attempted
+        requests.get() received, and also the backup_source_url parsed from this response string
     :returns: response_last_url that this attempted requests.session.get() received
     """
     try:
-        response_last_url.encoding = 'utf-8'
-        escaped_string = re.match('.+unescape\(\"(.+)\"\)\);', response_last_url.text).group(1)
-        unescaped_string = urllib.parse.unquote_plus(escaped_string)
-        backup_source_url = re.match('.*\n.*iframe src="(.+)"  height=.*\n.*',
-                                     unescaped_string).group(1)
-        log_changed_urlsite(backup_source_url)
+        response_last_url = back_response[0]
+        backup_source_url = back_response[1]
         header = {'Referer':backup_source_url}
         response_last_url = execute_next_http_request(response_last_url,
-                                                      backup_source_url,
+                                                      backup_source_url+'heatmap.php?group=all',
+                                                      True,
+                                                      None,
+                                                      header)
+        response_last_url.encoding = 'utf-8'
+        #Backup data!  -> backup data source .save()
+        save_parsed_fxdata_to_usdtable(response_last_url.text)
+        return response_last_url
+    except Exception as error:
+        print(error)
+        close_fxalarm_session(response_last_url)
+        raise
+
+def request_backupsource_eurous_sess_data(back_response: list):
+    """
+    This function request navigation (European Session <group=ad> not Asian Session Only
+        <group=all>) immediately follows after request_backupsource_link(), but before
+        close_fxalarm_session().
+    This function is responsible for executing from the request for the backup data source html
+        page in case of the event that the main source html page were to fail to respond.
+    :param 1: back_response as a list of two things: the response_last_url that this attempted
+        requests.get() received, and also the backup_source_url parsed from this response string
+    :returns: response_last_url that this attempted requests.session.get() received
+    """
+    try:
+        response_last_url = back_response[0]
+        backup_source_url = back_response[1]
+        header = {'Referer':backup_source_url}
+        response_last_url = execute_next_http_request(response_last_url,
+                                                      backup_source_url+'heatmap.php?group=ad',
                                                       True,
                                                       None,
                                                       header)

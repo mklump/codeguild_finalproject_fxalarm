@@ -3,15 +3,15 @@ Python Coding Bootcamp (pdxcodeguild)
 FXAlarm Final Project file finsalproject_fxalarm/parse_fxalarm.py
 by Matthew James K on 5/25/2016
 """
+import re
 import sys
+import urllib
 import threading
 from time import sleep
 from subprocess import Popen, PIPE, STDOUT
 from seleniumrequests import Remote
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import WebDriverException
 from seleniumrequests.request import RequestMixin
-from selenium import webdriver
+from selenium.webdriver import Remote as remote_webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 JAVA_PROCESS = None
@@ -28,7 +28,7 @@ def run_java_loc_server():
     """
     global JAVA_PROCESS
     try:
-        JAVA_PROCESS = Popen(['java.exe', '-cp',
+        JAVA_PROCESS = Popen(['java.exe', '-cp', # -cp <class search path of directories and zip/jar files> for jvm javaruntime v7+
                               'htmlunit-driver-standalone-2.21.jar;' +
                               'selenium-server-standalone-2.53.1.jar',
                               'org.openqa.grid.selenium.GridLauncher'],
@@ -55,24 +55,47 @@ def pstart_loc_server():
 def main():
     try:
         java_proc = pstart_loc_server()
-        htmlunit_driver = HtmlUnitJS(command_executor='http://localhost:4444/wd/hub',
-                                     desired_capabilities={'browserName': 'htmlunit',
-                                                           'javascriptEnabled': True,
-                                                           'platform': 'ANY',
-                                                           'version': 'firefox'})
-        htmlunit_driver.set_page_load_timeout(2)
-        htmlunit_driver.set_script_timeout(2)
-        web_driver_wait = WebDriverWait(htmlunit_driver, 1, 0.5, Exception)
+        htmlunit_driver = HtmlUnitJS(
+            command_executor='http://localhost:4444/wd/hub',
+            keep_alive=True,
+            desired_capabilities={'browserName': 'htmlunit',
+                                  'javascriptEnabled': True,
+                                  'platform': 'ANY',
+                                  'version': 2})
+
+        encoded_script = ''
+        decoded = urllib.parse.unquote(encoded_script)
+        source_script = re.match('[ \n\t]*<script.*>[ \n\t]*(.+)[ \n\t]*<\/script>$', decoded)
+        if source_script == None:
+            raise RuntimeError('No match.')
+        else:
+            outter_script = source_script.group(1)
+        inner_url = re.match('.*iframe src=\"([httphm:\/\.0-9]+)\"', outter_script).group(1)
+        htmlunit_driver.get('')
+        euro_us_session = htmlunit_driver.request(method='get', url=inner_url+'heatmap.php?group=ad', page_load_timeout=2)
+        asian_session = htmlunit_driver.request(method='get', url=inner_url+'heatmap.php?group=all', page_load_timeout=2)
+        print('EURO US SESSION')
+        print(euro_us_session.text)
+        print('ASIAN SESSION')
+        print(asian_session.text)
+        
+        #htmlunit_driver.execute_script(outter_script)
+        #source1 = htmlunit_driver.find_element_by_tag_name('html')
+        #source2 = htmlunit_driver.page_source
+        #source3 = htmlunit_driver.page_source.text
+        #find_elements_by_tag_name
+        
         #htmlunit_driver.execute_script('return document.readyState;').equals('complete')
-        htmlunit_driver.get('http://www.forexearlywarning.com')
-        htmlunit_driver.request(method='POST', url='http://www.forexearlywarning.com',
-            find_window_handle_timeout=1, page_load_timeout=2, headers={}, cookies={}, data={})
 
-        htmlunit_driver = Remote("http://localhost:4444/wd/hub",
-                                 DesiredCapabilities.HTMLUNITWITHJS)
+        #htmlunit_driver.request(method='POST', url='http://204.12.52.120/hm3488746/',
+        #    find_window_handle_timeout=1, page_load_timeout=2, headers={}, cookies={}, data={})
+        #htmlunit_driver.get('http://204.12.52.120/hm3488746/')
 
-        htmlunit_driver = webdriver.Remote("http://localhost:4444/wd/hub",
-                                           DesiredCapabilities.HTMLUNITWITHJS)
+        #htmlunit_driver = Remote("http://localhost:4444/wd/hub",
+        #                         DesiredCapabilities.HTMLUNITWITHJS)
+
+        #htmlunit_driver = webdriver.Remote("http://localhost:4444/wd/hub",
+        #                                   DesiredCapabilities.HTMLUNITWITHJS)
     except Exception as error:
         java_proc.terminate() #stop the running server process container thread!
         print(error)

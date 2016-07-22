@@ -98,7 +98,8 @@ def render_dynamic_eventlogviewer(request):
 
     while not get_stop_execution():
         last_response = parse_fxalarm.request_mainsource_data(main_response)
-        last_response = parse_fxalarm.request_backupsource_data(backup_response)
+        backup_response = parse_fxalarm.request_backupsource_asian_sess_data(backup_response)
+        last_response = parse_fxalarm.request_backupsource_eurous_sess_data(backup_response)
     # end of while not get_stop_execution():
 
     parse_fxalarm.close_fxalarm_session(last_response)
