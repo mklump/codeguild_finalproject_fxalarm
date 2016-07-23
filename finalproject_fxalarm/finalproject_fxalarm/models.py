@@ -25,14 +25,14 @@ class MyCredentials(models.Model):
             'target_website={1}').format(self.username_as_email, self.target_website)
 
     def __repr__(self):
-        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistant
+        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistent
         return ('MyCredentials(username_as_email={0},password=\'Ask Matthew.\',' + \
             'target_website={1}').format(self.username_as_email, self.target_website)
 
 class USD(models.Model):
     """
     USD class represents the seven currency pairs for streaming US Dollar data from the
-    subscription website datasource.
+    subscription website data source.
     """
     EURUSD = models.FloatField()
     GBPUSD = models.FloatField()
@@ -57,7 +57,7 @@ class USD(models.Model):
             raise RuntimeError(error)
 
         time_field = time_field.strftime('%Y-%m-%d %H:%M:%S %Z')
-        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistant
+        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistent
         return ('EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
             ' timestamp={7}').format(self.EURUSD, self.GBPUSD, self.USDJPY, self.USDCAD,
                                     self.USDCHF, self.AUDUSD, self.NZDUSD, time_field)

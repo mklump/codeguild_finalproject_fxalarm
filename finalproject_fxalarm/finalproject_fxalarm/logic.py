@@ -5,8 +5,33 @@ FXAlarm Final Project file finsalproject_fxalarm/logic.py
 by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 """
 import os
+from time import sleep
+import threading
 from . import models
 from . import parse_fxalarm
+
+stop_execution = False
+"""
+This global boolean variable in this views.py file will be evaluated each time the main data
+gathering while-loop with in the view function render_dynamic_eventlogviewer() executes as
+that while-loop's stop condition.
+"""
+
+def get_stop_execution():
+    """
+    This getter function returns the boolean global variable stop_execution.
+    :returns: stop_execution as boolean global variable while-loop stop condition
+    """
+    global stop_execution
+    return stop_execution
+
+def set_stop_execution(value):
+    """
+    This setter function assigns the boolean global variable stop_execution.
+    :param 1: value as boolean literal to assign to global variable stop_execution.
+    """
+    global stop_execution
+    stop_execution = value
 
 def get_usd_summary():
     """
@@ -98,3 +123,63 @@ def reset_currency_database():
         models.USD.objects.all().delete()
     retval_clear_status = True if models.USD.objects.count() == 0 else False
     return retval_clear_status
+
+def usd_datagathering_thread():
+    """
+    This function delegate for the main thread start is responsible for starting off the US Dollar
+    data gathering lines of code that was previously running in the view function for rendering
+    the dynamic data viewing web page.
+    If this program required a main() top-most level function to start the entire program - this
+    function delegate used in a thread would be it!
+    The if code block sets up the session for gathering, and the while code block does the actual
+    gathering.
+    The while loop stops running after the stop_execution boolean global variable is changed from
+    the corresponding button being pressed on the fxalarm_event_log.html web page.
+    """
+    main_execution = None
+    backup_execution = None
+    parse_fxalarm.startup_htmlunitjs_webdriver()
+    last_response = parse_fxalarm.check_http_response(parse_fxalarm.get_target_website())
+    if not get_stop_execution():
+        username_as_email = models.MyCredentials.objects.all().values(
+            'username_as_email')[0]['username_as_email']
+        password = models.MyCredentials.objects.all().values('password')[0]['password']
+        parse_fxalarm.erase_saved_cookielogfile()
+        last_response = parse_fxalarm.open_fxalarm_session(
+            username_as_email, password, last_response
+            )
+        last_response = parse_fxalarm.request_memberarea_navigation(last_response)
+        get_the_link_response = parse_fxalarm.request_heatmap_navigation(last_response)
+        main_response = parse_fxalarm.request_mainsource_link(get_the_link_response)
+        main_response = parse_fxalarm.get_mainsource_components(main_response)
+        main_response = parse_fxalarm.create_mainsource_session(
+            main_response[0], main_response[1], main_response[2], main_response[3])
+        backup_response = parse_fxalarm.request_backupsource_link(get_the_link_response)
+
+    while not get_stop_execution():
+        last_response = parse_fxalarm.request_mainsource_data(main_response)
+        last_response = parse_fxalarm.request_backupsource_asian_sess_data(backup_response)
+        last_response = parse_fxalarm.request_backupsource_eurous_sess_data(backup_response)
+    # end of while not get_stop_execution():
+
+def start_usd_datagathering_thread():
+    """
+    This function is responsible for starting the fxalarm main() delegate data gathering thread.
+    """
+    thread = threading.Thread(target=usd_datagathering_thread)
+    thread.start()
+    sleep(1)
+    print('The main() function delegate usd_datagathering_thread() is running.')
+    #print_usd_gathered_data()
+
+def print_usd_gathered_data():
+    """
+    This function prints to standard out the actual data gathered from the target website.
+    """
+    print('The following lines presented are the USD Summary lines:')
+    print(get_usd_summary())
+    print('The following lines presented are the USD Detail lines:')
+    print(get_usd_detail())
+
+if __name__ == "__main__":
+    sys.exit(int(start_usd_datagathering_thread() or 0))

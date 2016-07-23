@@ -6,7 +6,6 @@ by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 
 Definition of views.
 """
-
 from django.shortcuts import render
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -15,28 +14,6 @@ from django.template import RequestContext
 from . import logic
 from . import models
 from . import parse_fxalarm
-
-stop_execution = False
-"""
-This global boolean variable in this views.py file will be evaluated each time the main data
-gathering while-loop with in the view function render_dynamic_eventlogviewer() executes as
-that while-loop's stop condition.
-"""
-
-def get_stop_execution():
-    """
-    This getter function returns the boolean global variable stop_execution.
-    :returns: stop_execution as boolean global variable while-loop stop condition
-    """
-    return stop_execution
-
-def set_stop_execution(value):
-    """
-    This setter function assigns the boolean global variable stop_execution.
-    :param 1: value as boolean literal to assign to global variable stop_execution.
-    """
-    global stop_execution
-    stop_execution = value
 
 def render_home(request):
     """
@@ -76,44 +53,17 @@ def render_dynamic_eventlogviewer(request):
     This view function renders real-time data content to the event viewer and log page route to
     fxalarm_event_log.html
     """
-    main_execution = None
-    backup_execution = None
-    parse_fxalarm.startup_htmlunitjs_webdriver()
-    last_response = parse_fxalarm.check_http_response(parse_fxalarm.get_target_website())
-    if not get_stop_execution():
-        username_as_email = models.MyCredentials.objects.all().values(
-            'username_as_email')[0]['username_as_email']
-        password = models.MyCredentials.objects.all().values('password')[0]['password']
-        parse_fxalarm.erase_saved_cookielogfile()
-        last_response = parse_fxalarm.open_fxalarm_session(
-            username_as_email, password, last_response
-            )
-        last_response = parse_fxalarm.request_memberarea_navigation(last_response)
-        get_the_link_response = parse_fxalarm.request_heatmap_navigation(last_response)
-        main_response = parse_fxalarm.request_mainsource_link(get_the_link_response)
-        main_response = parse_fxalarm.get_mainsource_components(main_response)
-        main_response = parse_fxalarm.create_mainsource_session(
-            main_response[0], main_response[1], main_response[2], main_response[3])
-        backup_response = parse_fxalarm.request_backupsource_link(get_the_link_response)
+    logic.set_stop_execution(False)
 
-    while not get_stop_execution():
-        last_response = parse_fxalarm.request_mainsource_data(main_response)
-        backup_response = parse_fxalarm.request_backupsource_asian_sess_data(backup_response)
-        last_response = parse_fxalarm.request_backupsource_eurous_sess_data(backup_response)
-    # end of while not get_stop_execution():
-
-    parse_fxalarm.close_fxalarm_session(last_response)
-    set_stop_execution(False)
-
-    usd_summary = logic.get_usd_summary()
-    usd_detail = logic.get_usd_detail()
+    #usd_summary = logic.get_usd_summary()
+    #usd_detail = logic.get_usd_detail()
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
         {
             'title_eventlog':'USD Live Streaming Data',
-            'usd_summary':usd_summary,
-            'usd_detail':usd_detail,
+            #'usd_summary':usd_summary,
+            #'usd_detail':usd_detail,
         }
     )
 
@@ -124,8 +74,8 @@ def render_stop_gathering(request, stop_gathering):
     named stop_execution that this while loop will be checking as a stop condition.
     """
     if stop_gathering == 'True':
-        set_stop_execution(True)
-    render_dynamic_eventlogviewer(request)
+        logic.set_stop_execution(True)
+    parse_fxalarm.close_fxalarm_session()
     return HttpResponse('')
 
 def render_peace_be_with_you(request):

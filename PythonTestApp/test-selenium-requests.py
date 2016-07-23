@@ -48,7 +48,7 @@ def pstart_loc_server():
     """
     thread = threading.Thread(target=run_java_loc_server)
     thread.start()
-    sleep(5)
+    sleep(1)
     global JAVA_PROCESS
     return JAVA_PROCESS
 

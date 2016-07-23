@@ -36,7 +36,7 @@ remote htmlunit web driver.
 
 def get_htmlunitjs_driver():
     """
-    This is the get function for the globale variable htmlunitjs_driver.
+    This is the get function for the global variable htmlunitjs_driver.
     """
     return htmlunitjs_driver
 
@@ -119,7 +119,7 @@ def get_target_website():
 def startup_htmlunitjs_webdriver():
     """
     This function starts up the selenium-requests remote webdriver, and simultaneously connects
-    the htmlunit parser client web broswer.
+    the htmlunit parser client web browser.
     """
     global java_server
     global htmlunitjs_driver
@@ -179,14 +179,14 @@ def execute_next_http_request(response_last_url,
                 url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
                 headers=headers,          # required for all requests
-                page_load_timeout=2
+                page_load_timeout=5
                 )
         else:
             response_last_url = get_htmlunitjs_driver().request(method='post',
                 url=request_url,         # required for all requests
                 data=request_params,     # required for most requests
                 headers=headers,          # required for all requests
-                page_load_timeout=2
+                page_load_timeout=5
                 )
         log_changed_cookies(response_last_url)
         return check_response_last_url(response_last_url, headers, request_params)
@@ -394,7 +394,6 @@ def request_mainsource_data(response_last_url):
     try:
         primary_source_url = response_last_url.url
         request_headers = {'Referer':primary_source_url}
-        time.sleep(3) # Wait here 3 seconds before proceeding.
         response_last_url = htmlunitjs_driver.request(
             method='get', url=primary_source_url, find_window_handle_timeout=2,
             page_load_timeout=2, headers=request_headers)
