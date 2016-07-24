@@ -53,7 +53,6 @@ def render_dynamic_eventlogviewer(request):
     This view function renders real-time data content to the event viewer and log page route to
     fxalarm_event_log.html
     """
-    logic.set_stop_execution(False)
     return render(
         request,
         'finalproject_fxalarm/fxalarm_event_log.html',
@@ -66,6 +65,7 @@ def render_start_gathering(request):
     The thread will first launch the selenium remote webdriver separate thread, and then starts
     the data gathering in this current running thread.
     """
+    logic.set_stop_execution(False)
     logic.start_usd_datagathering_thread()
     return render(
         request,

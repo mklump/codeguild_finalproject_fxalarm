@@ -160,6 +160,8 @@ def usd_datagathering_thread():
     """
     main_execution = None
     backup_execution = None
+    global stop_execution
+    stop_execution = False
     parse_fxalarm.startup_htmlunitjs_webdriver()
     last_response = parse_fxalarm.check_http_response(parse_fxalarm.get_target_website())
     if not get_stop_execution():
