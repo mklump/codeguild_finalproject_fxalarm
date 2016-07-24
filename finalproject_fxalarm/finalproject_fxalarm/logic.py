@@ -5,8 +5,10 @@ FXAlarm Final Project file finsalproject_fxalarm/logic.py
 by Matthew James K (PIPs for Heaven, LLC) on 5/25/2016
 """
 import os
-from time import sleep
 import threading
+from time import sleep
+from datetime import datetime
+from dateutil.tz import tzlocal
 from . import models
 from . import parse_fxalarm
 
@@ -41,9 +43,29 @@ def get_usd_summary():
     """
     currency_collection = []
     for row in models.USD.objects.all():
-        time_field = repr(row).rsplit(' timestamp=')[1]
+        time_field = get_usd_row_as_string(row).rsplit(' timestamp=')[1]
         currency_collection.append('USD Capture: at %s' % time_field)
     return currency_collection
+
+def get_usd_row_as_string(row: models.USD):
+    """
+    This function accepts a data row of the models.USD table, and returns back a string formatting
+    of that row with a local time zone.
+    :param 1: row as models.USD is the data row of the models.USD data table that must be printed
+    :returns: the string representation with the saved time stamp when the data was collected
+    """
+    time_field = None
+    try:
+        time_field = datetime.fromtimestamp(row.timestamp.timestamp(), tzlocal())
+        time_field = time_field.strftime('%Y-%m-%d %H:%M:%S %Z')
+        # Future reminder: KEEP ''.format() call as ('{var1} {var2}').format(var1, var2) consistent
+        return ('EURUSD={0} GBPUSD={1} USDJPY={2} USDCAD={3} USDCHF={4} AUDUSD={5} NZDUSD={6}' + \
+            ' timestamp={7}').format(row.EURUSD, row.GBPUSD, row.USDJPY, row.USDCAD,
+                                row.USDCHF, row.AUDUSD, row.NZDUSD, time_field)
+    except Exception as error:
+        print(error)
+        parse_fxalarm.close_fxalarm_session()
+        raise RuntimeError(error)
 
 def get_usd_detail():
     """
@@ -53,7 +75,7 @@ def get_usd_detail():
     """
     currency_collection = []
     for row in models.USD.objects.all():
-        currency_collection.append(repr(row).rsplit(' timestamp=')[0])
+        currency_collection.append(get_usd_row_as_string(row).rsplit(' timestamp=')[0])
     return currency_collection
 
 def save_static_usd_data():
@@ -158,14 +180,21 @@ def usd_datagathering_thread():
 
     while not get_stop_execution():
         last_response = parse_fxalarm.request_mainsource_data(main_response)
+        sleep(0)
         last_response = parse_fxalarm.request_backupsource_asian_sess_data(backup_response)
+        sleep(0)
         last_response = parse_fxalarm.request_backupsource_eurous_sess_data(backup_response)
+        sleep(0)
     # end of while not get_stop_execution():
+    parse_fxalarm.close_fxalarm_session()
 
 def start_usd_datagathering_thread():
     """
     This function is responsible for starting the fxalarm main() delegate data gathering thread.
     """
+    if reset_currency_database() == False:
+        raise RuntimeError('The currency database table(s) was not properly cleared/reset before' +
+                           'next run.')
     thread = threading.Thread(target=usd_datagathering_thread)
     thread.start()
     sleep(1)

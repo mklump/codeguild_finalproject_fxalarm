@@ -14,12 +14,13 @@ admin.autodiscover()
 from . import views
 
 urlpatterns = [
-    #url(r'^$', views.render_home, name='home'),
-    url(r'^$', views.render_dynamic_eventlogviewer, name = 'home'),
+    url(r'^$', views.render_home, name='home'),
+    #url(r'^$', views.render_dynamic_eventlogviewer, name = 'home'),
 
     #url(r'^viewer$|^event_viewer$|^log$', views.render_static_eventlogviewer, name='event_viewer'),
-    url(r'^viewer$|^event_viewer$|^log$', views.render_dynamic_eventlogviewer, name='event_viewer'),
-    url(r'^event_viewer/(?P<stop_gathering>.+)$', views.render_stop_gathering, name='stop_gathering'),
+    url(r'^viewer$', views.render_dynamic_eventlogviewer, name='event_viewer'),
+    url(r'^viewer/start$', views.render_start_gathering, name='start_gathering'),
+    url(r'^viewer/stop/(?P<stop_gathering>.+)$', views.render_stop_gathering, name='stop_gathering'),
     url(r'^peace$', views.render_peace_be_with_you, name='peace_onto_you'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

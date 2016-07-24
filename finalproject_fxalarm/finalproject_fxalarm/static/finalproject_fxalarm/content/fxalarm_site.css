@@ -69,6 +69,14 @@ body {
     width: 100%;
 }
 
+.view_select_summary {
+    max-height: 344.5px;
+}
+
+.view_item_detail {
+    max-height: 344.5px;
+}
+
 .max_width_eventlog {
     max-width: 61.3em;
 }

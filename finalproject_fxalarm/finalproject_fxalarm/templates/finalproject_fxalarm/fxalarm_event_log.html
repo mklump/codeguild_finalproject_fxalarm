@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
 Python Coding Bootcamp (pdxcodeguild)
 Code File for templates/finalproject_fxalarm/fxalarm_event_log.html
@@ -22,24 +22,30 @@ by: Matthew James K on 5/16/2016
 				value="Ctrl+Select multiple summaries or click VIEW ALL:"/>
 			<input class="eventlogviewall eventloglabel" type="submit" value="VIEW ALL" />
             <select class="view_select_summary max_width_eventlog" multiple="multiple">
-<!--                {% for summary in usd_summary %}
+                {% for summary in usd_summary %}
                     <option>{{ summary }}</option>
-                {% endfor %}-->
+                {% endfor %}
             </select>
         </blockquote>
         <blockquote class="column_viewer">
             <p class="eventloglabel">USD Instance Detail:</p>
             <select class="view_item_detail max_width_eventlog" multiple="multiple">
-<!--                {% for detail in usd_detail %}
+                {% for detail in usd_detail %}
                     <option>{{ detail }}</option>
-                {% endfor %}-->
+                {% endfor %}
             </select>
         </blockquote>
+        <blockquote>
+            {#<a><input class="btn_eventviewer" type="submit" value="Start Main Data Gathering Execution" /></a>#}
+        	<a href="{% url 'start_gathering' %}">
+            	<input class="btn_eventviewer" type="submit" value="Start Main Data Gathering Execution" />
+            </a>
+        </blockquote>
 		<blockquote>
-			<a><input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" /></a>
-            {#<a href="{% url 'stop_gathering' 'True' %}">#}
-            	{#<input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" />#}
-            {#</a>#}
+			{#<a><input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" /></a>#}
+            <a href="{% url 'stop_gathering' 'True' %}">
+            	<input class="btn_eventviewer" type="submit" value="Stop Main Data Gathering Execution" />
+            </a>
         </blockquote>
         <blockquote>
             <a href="{% url 'peace_onto_you' %}">
